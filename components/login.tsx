@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 // import {Signup} from "@/components/Signup";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -17,13 +16,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  async function handleLoginWithPassword(e: { preventDefault: () => void; }) {
 
-  async function handleLoginWithPassword(e: React.FormEvent) {
     e.preventDefault();
     
     if (email.length < 5 || password.length < 6) {
@@ -42,10 +43,12 @@ export default function Login() {
         toast.error(`Error logging in: ${error.message}`);
       } else {
         toast.success("Logged in successfully!");
-        // Optional: Redirect user here using next/navigation useRouter
+        // Redirect to dashboard
+        router.push("/dashboard");
+        
       }
     } catch (err) {
-      toast.error("An unexpected error occurred.");
+      toast.error(`An unexpected error occurred. ${err instanceof Error ? err.message : "Please try again later."}`);
     } finally {
       setLoading(false);
     }
@@ -105,6 +108,7 @@ export default function Login() {
           <CardFooter className="flex-col gap-2">
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Logging in..." : "Login"}
+
             </Button>
           </CardFooter>
         </form>
