@@ -1,0 +1,12 @@
+'use client';
+
+import Signup from "@/components/Signup";
+
+export default function SignupPage() {
+  return (
+    <div className="flex flex-col gap-4 min-h-screen items-center justify-center p-4">
+      <h1 className="text-2xl font-bold">Signup Page</h1>
+      <Signup />
+    </div>
+  );
+}
