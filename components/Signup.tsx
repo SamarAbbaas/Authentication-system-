@@ -170,7 +170,7 @@ export default function Signup() {
         if (session) {
           router.push("/dashboard");
         } else {
-          toast.info("Check your email to confirm your account");
+          toast("Check your email to confirm your account");
         }
       } else {
         toast.error("Signup failed. Please try again.");
