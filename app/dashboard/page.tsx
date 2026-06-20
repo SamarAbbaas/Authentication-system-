@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
+import type { User } from '@supabase/supabase-js';
 
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
