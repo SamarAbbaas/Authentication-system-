@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Card,
   CardContent,
@@ -9,11 +9,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
-import { Button } from "@base-ui/react";
+import { waitForSession } from "@/lib/auth-utils";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
+
+
 export default function Signup() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,16 +32,24 @@ export default function Signup() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email: email,
         password: password,
       });
 
       if (error) {
-        toast.error(`Error logging in: ${error.message}`);
+        toast.error(`Error signing up: ${error.message}`);
+      } else if (data.user) {
+        toast.success("Signed up successfully!");
+        // Wait for session to be persisted
+        const session = await waitForSession(supabase);
+        if (session) {
+          router.push("/dashboard");
+        } else {
+          toast.info("Check your email to confirm your account");
+        }
       } else {
-        toast.success("Logged in successfully!");
-        // Optional: Redirect user here using next/navigation useRouter
+        toast.error("Signup failed. Please try again.");
       }
     } catch (err) {
       toast.error(`An unexpected error occurred. ${err instanceof Error ? err.message : ''}`);

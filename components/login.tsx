@@ -1,7 +1,8 @@
-"use client";
-
+ 
+'use client';
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { waitForSession } from "@/lib/auth-utils";
 import { Button } from "@/components/ui/button";
 // import {Signup} from "@/components/Signup";
 import {
@@ -17,6 +18,12 @@ import { Label } from "@/components/ui/label";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "login",
+};
+ 
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -34,18 +41,24 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         toast.error(`Error logging in: ${error.message}`);
-      } else {
+      } else if (data.session) {
         toast.success("Logged in successfully!");
-        // Redirect to dashboard
-        router.push("/dashboard");
-        
+        // Wait for session to be persisted
+        const session = await waitForSession(supabase);
+        if (session) {
+          router.push("/dashboard");
+        } else {
+          toast.error("Session not persisted. Please try again.");
+        }
+      } else {
+        toast.error("Login successful but no session created");
       }
     } catch (err) {
       toast.error(`An unexpected error occurred. ${err instanceof Error ? err.message : "Please try again later."}`);
@@ -56,6 +69,7 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
+
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>

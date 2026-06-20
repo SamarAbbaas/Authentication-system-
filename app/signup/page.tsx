@@ -1,6 +1,10 @@
-'use client';
 
 import Signup from "@/components/Signup";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "signup",
+};
 
 export default function SignupPage() {
   return (
