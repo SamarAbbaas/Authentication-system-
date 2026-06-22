@@ -3,7 +3,7 @@ import Signup from "@/components/Signup";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "signup",
+  title: "Sign up",
 };
 
 export default function SignupPage() {
