@@ -81,7 +81,7 @@ const Newsletter = () => {
           onSubmit={(e) => e.preventDefault()}
           variants={itemVariants}
         >
-          <div className="relative flex flex-col   justify-center sm:flex-row items-center bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200/80 dark:border-gray-600/80 group focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-all duration-300">
+          <div className="relative flex flex-col  gap-4  justify-center sm:flex-row items-center bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200/80 dark:border-gray-600/80 group focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-all duration-300">
             {/* <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 hidden sm:block" /> */}
 
             {/* <input
@@ -94,6 +94,10 @@ const Newsletter = () => {
             <button 
                       className="w-full sm:w-auto px-6 py-3 bg-yellow-400 dark:bg-yellow-500 text-gray-900 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
               <Link href='/signup'>Signup</Link>
+            </button>
+            <button 
+                      className="w-full sm:w-auto px-6 py-3 bg-black  text-gray-100 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
+              <Link href='/signin'>Signin</Link>
             </button>
           </div>
         </motion.form>
@@ -141,16 +145,12 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
 
 
-  <Newsletter />;
+  <Newsletter />
 
 
 
       
-
-<div className="">
-  <Button variant={'link'}> <Link href='/signin'>Signin</Link></Button>
-</div>
-      
+ 
     </main>
   );
 }
