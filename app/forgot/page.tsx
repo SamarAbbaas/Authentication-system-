@@ -119,7 +119,7 @@ export default function ForgotPassword() {
               We have sent a password reset link to <strong className="text-gray-900 dark:text-white">{email}</strong>. 
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500">
-              Didn't receive the email? Check your spam folder or try again.
+            i have not receive the email? Check your spam folder or try again.
             </p>
             <button 
               onClick={() => setIsSubmitted(false)}
@@ -133,11 +133,11 @@ export default function ForgotPassword() {
         {/* Footer Link to return to login */}
         <div className="text-center">
           <Link 
-            href="/login" 
+            href="/signin" 
             className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
             <ArrowLeftIcon />
-            <span>Back to sign in</span>
+            <span>Back to sign in </span>
           </Link>
         </div>
       </div>
