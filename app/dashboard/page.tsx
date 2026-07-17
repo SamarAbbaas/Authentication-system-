@@ -6,6 +6,12 @@ import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
+import { Image } from 'lucide-react';
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
 
 
 export default function DashboardPage() {
@@ -56,6 +62,9 @@ const [user, setUser] = useState<User | null>(null);
       <h1 className="text-2xl font-bold">Dashboard</h1>
       {user && <p className="mb-4">Welcome, {user.email}</p>}
       <Button onClick={handleLogout}>Logout</Button>
-    </div>
+      <Image>This is profile picture of the user 
+      </Image>
+
+          </div>
   );
 }
