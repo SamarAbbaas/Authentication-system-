@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, CheckCircle2, UploadCloud, UserCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, UploadCloud, UserCircle2, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 
-const bucketName = "image2";
+// Get bucket name from environment variable
+const bucketName = process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME || "image2";
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const uploadAvatar = async (file: File, userId: string) => {
-	const fileName = `${userId}/avatar.jpg`;
+	// Generate unique filename with timestamp
+	const fileName = `${userId}/${Date.now()}_${file.name}`;
 
 	const { data, error } = await supabase.storage.from(bucketName).upload(fileName, file, {
-		upsert: true,
+		upsert: false, // Changed to false to prevent overwrites
 		contentType: file.type || "image/jpeg",
 	});
 
@@ -39,20 +42,30 @@ export default function UploadPage() {
 	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 	const [uploading, setUploading] = useState(false);
 	const [uploadedPath, setUploadedPath] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const loadSession = async () => {
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
+			try {
+				const {
+					data: { session },
+				} = await supabase.auth.getSession();
 
-			if (!session) {
+				if (!session) {
+					router.push("/signin");
+					return;
+				}
+
+				setUserId(session.user.id);
+				setEmail(session.user.email ?? null);
+			} catch (err) {
+				console.error("Session error:", err);
+				toast.error("Failed to load session");
 				router.push("/signin");
-				return;
+			} finally {
+				setIsLoading(false);
 			}
-
-			setUserId(session.user.id);
-			setEmail(session.user.email ?? null);
 		};
 
 		loadSession();
@@ -71,14 +84,35 @@ export default function UploadPage() {
 		return `${file.name} • ${(file.size / 1024 / 1024).toFixed(2)} MB`;
 	}, [file]);
 
+	const validateFile = (file: File): string | null => {
+		if (!file.type.startsWith("image/")) {
+			return "Only image files are allowed";
+		}
+		if (file.size > MAX_FILE_SIZE) {
+			return `File size must be less than 5MB (current: ${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+		}
+		return null;
+	};
+
 	const handleFileChange = (selectedFile: File | null) => {
+		setError(null);
+		setUploadedPath(null);
+
 		if (previewUrl) {
 			URL.revokeObjectURL(previewUrl);
 		}
 
+		if (selectedFile) {
+			const validationError = validateFile(selectedFile);
+			if (validationError) {
+				setError(validationError);
+				toast.error(validationError);
+				return;
+			}
+		}
+
 		setFile(selectedFile);
 		setPreviewUrl(selectedFile ? URL.createObjectURL(selectedFile) : null);
-		setUploadedPath(null);
 	};
 
 	const handleClearSelection = () => {
@@ -89,6 +123,7 @@ export default function UploadPage() {
 		setFile(null);
 		setPreviewUrl(null);
 		setUploadedPath(null);
+		setError(null);
 	};
 
 	const handleUpload = async () => {
@@ -102,26 +137,33 @@ export default function UploadPage() {
 			return;
 		}
 
-		if (!file.type.startsWith("image/")) {
-			toast.error("Only image files are allowed.");
-			return;
-		}
-
 		try {
 			setUploading(true);
+			setError(null);
 			const result = await uploadAvatar(file, userId);
 			setUploadedPath(result.path);
-			toast.success("Avatar uploaded successfully.");
-		} catch (error) {
-			const message = error instanceof Error ? error.message : "Upload failed.";
+			toast.success("Avatar uploaded successfully!");
+			// Clear file after successful upload
+			handleClearSelection();
+		} catch (err) {
+			const message = err instanceof Error ? err.message : "Upload failed.";
+			setError(message);
 			toast.error(message);
 		} finally {
 			setUploading(false);
 		}
 	};
 
+	if (isLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center bg-white bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(245,247,250,0.96)_35%,rgba(230,236,244,0.92)_100%)]">
+				<p className="text-muted-foreground">Loading...</p>
+			</div>
+		);
+	}
+
 	return (
-		<div className="min-h-screen  bg-white bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(245,247,250,0.96)_35%,rgba(230,236,244,0.92)_100%)] px-4 py-10 text-foreground sm:px-6 lg:px-8">
+		<div className="min-h-screen bg-white bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),rgba(245,247,250,0.96)_35%,rgba(230,236,244,0.92)_100%)] px-4 py-10 text-foreground sm:px-6 lg:px-8">
 			<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
 				<div className="flex items-center justify-between gap-3 rounded-2xl border bg-background/80 p-4 shadow-sm backdrop-blur">
 					<div>
@@ -139,7 +181,7 @@ export default function UploadPage() {
 						<CardHeader className="border-b border-border/60">
 							<CardTitle>Upload a new avatar</CardTitle>
 							<CardDescription>
-								Pick an image and replace the current avatar stored in the Supabase bucket.
+								Pick an image and upload it to your profile. Max file size: 5MB
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="space-y-5 pt-6">
@@ -153,9 +195,17 @@ export default function UploadPage() {
 									accept="image/*"
 									onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
 									className="h-auto py-2 file:mr-4 file:rounded-md file:border-0 file:bg-foreground file:px-3 file:py-2 file:text-sm file:font-medium file:text-background"
+									disabled={uploading}
 								/>
 								<p className="text-sm text-muted-foreground">{selectedFileLabel}</p>
 							</div>
+
+							{error && (
+								<div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+									<AlertCircle className="size-4" />
+									{error}
+								</div>
+							)}
 
 							<div className="flex flex-wrap gap-3">
 								<Button onClick={handleUpload} disabled={uploading || !file || !userId}>
@@ -177,10 +227,6 @@ export default function UploadPage() {
 								</Button>
 							</div>
 
-							{/* <div className="rounded-xl border border-dashed border-border/80 bg-muted/40 p-4 text-sm text-muted-foreground">
-								The avatar is stored as <span className="font-medium text-foreground">{bucketName}/{"<user-id>"}/avatar.jpg</span> so each user replaces their own file.
-							</div> */}
-
 							{uploadedPath ? (
 								<div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
 									<CheckCircle2 className="size-4" />
@@ -194,7 +240,7 @@ export default function UploadPage() {
 						<CardHeader className="border-b border-border/60">
 							<CardTitle>Preview</CardTitle>
 							<CardDescription>
-								See the selected file before sending it to Supabase.
+								See the selected file before uploading.
 							</CardDescription>
 						</CardHeader>
 						<CardContent className="flex min-h-90 flex-col items-center justify-center gap-4 pt-6">
@@ -217,7 +263,7 @@ export default function UploadPage() {
 							)}
 
 							<div className="max-w-sm text-center text-sm text-muted-foreground">
-								Signed in as {email ?? "unknown user"}. The upload button uses your session user id, so the file is tied to your account.
+								Signed in as <span className="font-medium text-foreground">{email ?? "unknown user"}</span>. Your upload is tied to your account.
 							</div>
 						</CardContent>
 					</Card>
