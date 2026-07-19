@@ -8,6 +8,14 @@ import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { Upload, ExternalLink, UserCircle2 } from 'lucide-react';
 
+// Shadcn UI Dialog Imports
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 // Bucket name hamare upload page ke mutabiq hona chahiye
 const BUCKET_NAME = "Samar Abbas";
 
@@ -102,32 +110,50 @@ export default function DashboardPage() {
           {/* Header Section with Profile Layout */}
           <div className="flex items-center justify-between border-b pb-4">
             <div>
-              <p className="text-sm   uppercase font-bold">Welcome Back</p>
-                     {user && <p className="mt-1 text-sm text-muted-foreground">{user.email} To </p>} 
+              <p className="text-sm uppercase font-bold">Welcome Back</p>
+              {user && <p className="mt-1 text-sm text-muted-foreground">{user.email} To </p>} 
               <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
-        
             </div>
 
-            {/* Global Avatar Circle Indicator */}
+            {/* Global Avatar Circle Indicator with Shadcn Dialog (Solution 2 Applied) */}
             <div className="flex flex-col items-center gap-1">
               {imageUrl ? (
-                <img 
-                  src={imageUrl} 
-                  alt="Global Avatar" 
-                  className="size-16 rounded-full border-2 border-emerald-500 object-cover shadow-sm ring-4 ring-emerald-50"
-                />
+                <Dialog>
+                  {/* asChild remove kar diya aur core classes direct trigger par laga di hain */}
+                  <DialogTrigger className="size-16 rounded-full border-2 border-emerald-500 overflow-hidden shadow-sm ring-4 ring-emerald-50 cursor-pointer hover:opacity-90 transition-opacity focus:outline-none">
+                    <img 
+                      src={imageUrl} 
+                      alt="Global Avatar" 
+                      className="h-full w-full object-cover"
+                    />
+                  </DialogTrigger>
+                  
+                  {/* Zoomed view setup */}
+                  <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
+                    {/* Accessibility ke liye hidden title */}
+                    <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
+                    
+                    <img 
+                      src={imageUrl} 
+                      alt="Avatar Expanded" 
+                      className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
+                    />
+                  </DialogContent>
+                </Dialog>
               ) : (
                 <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground shadow-sm">
                   <UserCircle2 className="size-8 opacity-40" />
                 </div>
               )}
-              {/* <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Live View</span> */}
             </div>
           </div>
 
           {/* Navigation Controls */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button onClick={() => router.push('/upload')} className="w-full">
+            <Button 
+              onClick={() => router.push('/upload')} 
+              className="w-full transition-transform duration-200 hover:scale-[1.02]"
+            >
               <Upload className="mr-2 size-4" />
               Manage / Update Avatar
             </Button>
@@ -135,38 +161,6 @@ export default function DashboardPage() {
               Logout
             </Button>
           </div>
-          
-          {/* Main Content Info Status */}
-          {/* {imageUrl ? (
-            <div className="rounded-2xl border border-emerald-100 bg-emerald-50/50 p-5 text-sm text-emerald-800">
-              <p className="font-medium mb-1 text-emerald-900">✨ Profile Photo Connected!</p>
-              Aapka avatar live hai. Yeh image aapko poori website par standard placeholder ki jagah dikhegi.
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed bg-muted/40 p-5 text-sm text-muted-foreground">
-              Aapne abhi tak koi avatar set nahi kiya. Ek acchi si photo upload karne ke liye upar diye gaye button par click karein.
-            </div>
-          )} */}
-          
-          {/* URL Metadata Display (Optional Debug View) */}
-          {/* {imageUrl && (
-            <div className="rounded-xl border bg-card p-3 shadow-inner">
-              <span className="block text-xs font-semibold mb-1 text-card-foreground">Raw Public Link:</span>
-              <div className="flex items-center justify-between gap-2 bg-muted p-2 rounded border">
-                <span className="text-xs text-muted-foreground font-mono truncate max-w-[80%]">
-                  {imageUrl}
-                </span>
-                <a 
-                  href={imageUrl} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="inline-flex items-center text-xs text-blue-500 hover:underline gap-0.5 font-medium shrink-0"
-                >
-                  View <ExternalLink className="size-3" />
-                </a>
-              </div>
-            </div>
-          )} */}
           
         </div>
       </div>
