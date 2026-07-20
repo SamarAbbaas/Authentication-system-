@@ -277,16 +277,23 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, UploadCloud, UserCircle2, AlertCircle, Trash2 } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  UploadCloud,
+  UserCircle2,
+  AlertCircle,
+  Trash2,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
 import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
@@ -296,301 +303,333 @@ const BUCKET_NAME = "Samar Abbas";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default function UploadPage() {
-	const router = useRouter();
-	const [userId, setUserId] = useState<string | null>(null);
-	const [email, setEmail] = useState<string | null>(null);
-	const [file, setFile] = useState<File | null>(null);
-	const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-	const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
-	const [uploading, setUploading] = useState(false);
-	const [deleting, setDeleting] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-	// 1. READ: Existing Avatar Check aur Session Load karna
-	useEffect(() => {
-		const loadSessionAndAvatar = async () => {
-			try {
-				const { data: { session } } = await supabase.auth.getSession();
+  // 1. READ: Existing Avatar Check aur Session Load karna
+  useEffect(() => {
+    const loadSessionAndAvatar = async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-				if (!session) {
-					router.push("/signin");
-					return;
-				}
+        if (!session) {
+          router.push("/signin");
+          return;
+        }
 
-				const uId = session.user.id;
-				setUserId(uId);
-				setEmail(session.user.email ?? null);
+        const uId = session.user.id;
+        setUserId(uId);
+        setEmail(session.user.email ?? null);
 
-				// Check agar pehle se koi avatar maujood hai
-				await fetchCurrentAvatar(uId);
-			} catch (err) {
-				console.error("Session error:", err);
-				toast.error("Failed to load session");
-				router.push("/signin");
-			} finally {
-				setIsLoading(false);
-			}
-		};
+        // Check agar pehle se koi avatar maujood hai
+        await fetchCurrentAvatar(uId);
+      } catch (err) {
+        console.error("Session error:", err);
+        toast.error("Failed to load session");
+        router.push("/signin");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-		loadSessionAndAvatar();
-	}, [router]);
+    loadSessionAndAvatar();
+  }, [router]);
 
-	// Clean up dynamic preview URL
-	useEffect(() => {
-		return () => {
-			if (previewUrl) URL.revokeObjectURL(previewUrl);
-		};
-	}, [previewUrl]);
+  // Clean up dynamic preview URL
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
-	// Current avatar fetch karne ka function
-	const fetchCurrentAvatar = async (uId: string) => {
-		try {
-			// Folder check karne ke liye files list karenge
-			const { data, error } = await supabase.storage
-				.from(BUCKET_NAME)
-				.list(uId);
+  // Current avatar fetch karne ka function
+  const fetchCurrentAvatar = async (uId: string) => {
+    try {
+      // Folder check karne ke liye files list karenge
+      const { data, error } = await supabase.storage
+        .from(BUCKET_NAME)
+        .list(uId);
 
-			if (error) throw error;
+      if (error) throw error;
 
-			// Agar folder me avatar file maujood hai
-			if (data && data.length > 0) {
-				const avatarFile = data.find((f) => f.name.startsWith("avatar"));
-				if (avatarFile) {
-					const { data: urlData } = supabase.storage
-						.from(BUCKET_NAME)
-						.getPublicUrl(`${uId}/${avatarFile.name}`);
-					
-					// Cache busting ke liye timestamp add kiya hai ताकि updated image फौरन दिखे
-					setCurrentAvatarUrl(`${urlData.publicUrl}?t=${Date.now()}`);
-				} else {
-					setCurrentAvatarUrl(null);
-				}
-			} else {
-				setCurrentAvatarUrl(null);
-			}
-		} catch (err) {
-			console.error("Error fetching avatar:", err);
-		}
-	};
+      // Agar folder me avatar file maujood hai
+      if (data && data.length > 0) {
+        const avatarFile = data.find((f) => f.name.startsWith("avatar"));
+        if (avatarFile) {
+          const { data: urlData } = supabase.storage
+            .from(BUCKET_NAME)
+            .getPublicUrl(`${uId}/${avatarFile.name}`);
 
-	const validateFile = (file: File): string | null => {
-		if (!file.type.startsWith("image/")) {
-			return "Only image files are allowed";
-		}
-		if (file.size > MAX_FILE_SIZE) {
-			return `File size must be less than 5MB`;
-		}
-		return null;
-	};
+          // Cache busting ke liye timestamp add kiya hai ताकि updated image फौरन दिखे
+          setCurrentAvatarUrl(`${urlData.publicUrl}?t=${Date.now()}`);
+        } else {
+          setCurrentAvatarUrl(null);
+        }
+      } else {
+        setCurrentAvatarUrl(null);
+      }
+    } catch (err) {
+      console.error("Error fetching avatar:", err);
+    }
+  };
 
-	const handleFileChange = (selectedFile: File | null) => {
-		setError(null);
-		if (previewUrl) URL.revokeObjectURL(previewUrl);
+  const validateFile = (file: File): string | null => {
+    if (!file.type.startsWith("image/")) {
+      return "Only image files are allowed";
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size must be less than 5MB`;
+    }
+    return null;
+  };
 
-		if (selectedFile) {
-			const validationError = validateFile(selectedFile);
-			if (validationError) {
-				setError(validationError);
-				toast.error(validationError);
-				return;
-			}
-			setFile(selectedFile);
-			setPreviewUrl(URL.createObjectURL(selectedFile));
-		} else {
-			setFile(null);
-			setPreviewUrl(null);
-		}
-	};
+  const handleFileChange = (selectedFile: File | null) => {
+    setError(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
 
-	// 2. CREATE / UPDATE: Upload & Replace operations
-	const handleUpload = async () => {
-		if (!userId || !file) return;
+    if (selectedFile) {
+      const validationError = validateFile(selectedFile);
+      if (validationError) {
+        setError(validationError);
+        toast.error(validationError);
+        return;
+      }
+      setFile(selectedFile);
+      setPreviewUrl(URL.createObjectURL(selectedFile));
+    } else {
+      setFile(null);
+      setPreviewUrl(null);
+    }
+  };
 
-		try {
-			setUploading(true);
-			setError(null);
+  // 2. CREATE / UPDATE: Upload & Replace operations
+  const handleUpload = async () => {
+    if (!userId || !file) return;
 
-			const fileExt = file.name.split(".").pop();
-			const fileName = `${userId}/avatar.${fileExt}`;
+    try {
+      setUploading(true);
+      setError(null);
 
-			// upsert: true lagaya hai taake agar pehle se file ho to wo UPDATE ho jaye (CRUD Ka U)
-			const { error: uploadError } = await supabase.storage
-				.from(BUCKET_NAME)
-				.upload(fileName, file, {
-					upsert: true, 
-					contentType: file.type,
-				});
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${userId}/avatar.${fileExt}`;
 
-			if (uploadError) throw uploadError;
+      // upsert: true lagaya hai taake agar pehle se file ho to wo UPDATE ho jaye (CRUD Ka U)
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .upload(fileName, file, {
+          upsert: true,
+          contentType: file.type,
+        });
 
-			toast.success(currentAvatarUrl ? "Avatar updated successfully!" : "Avatar uploaded successfully!");
-			
-			// File fields reset karke fresh avatar load karna
-			setFile(null);
-			setPreviewUrl(null);
-			await fetchCurrentAvatar(userId);
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Upload failed.";
-			setError(message);
-			toast.error(message);
-		} finally {
-			setUploading(false);
-		}
-	};
+      if (uploadError) throw uploadError;
 
-	// 3. DELETE: Avatar delete karne ka operation
-	const handleDelete = async () => {
-		if (!userId) return;
+      toast.success(
+        currentAvatarUrl
+          ? "Avatar updated successfully!"
+          : "Avatar uploaded successfully!",
+      );
 
-		const confirmDelete = window.confirm("Kya aap waqai apna avatar delete karna chahte hain?");
-		if (!confirmDelete) return;
+      // File fields reset karke fresh avatar load karna
+      setFile(null);
+      setPreviewUrl(null);
+      await fetchCurrentAvatar(userId);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Upload failed.";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setUploading(false);
+    }
+  };
 
-		try {
-			setDeleting(true);
-			
-			// Pehle list karke extension check karenge taake sahi file delete ho
-			const { data } = await supabase.storage.from(BUCKET_NAME).list(userId);
-			const avatarFile = data?.find((f) => f.name.startsWith("avatar"));
+  // 3. DELETE: Avatar delete karne ka operation
+  const handleDelete = async () => {
+    if (!userId) return;
 
-			if (!avatarFile) {
-				toast.error("No avatar found to delete.");
-				return;
-			}
+    const confirmDelete = window.confirm(
+      "Kya aap waqai apna avatar delete karna chahte hain?",
+    );
+    if (!confirmDelete) return;
 
-			const { error: deleteError } = await supabase.storage
-				.from(BUCKET_NAME)
-				.remove([`${userId}/${avatarFile.name}`]);
+    try {
+      setDeleting(true);
 
-			if (deleteError) throw deleteError;
+      // Pehle list karke extension check karenge taake sahi file delete ho
+      const { data } = await supabase.storage.from(BUCKET_NAME).list(userId);
+      const avatarFile = data?.find((f) => f.name.startsWith("avatar"));
 
-			setCurrentAvatarUrl(null);
-			toast.success("Avatar deleted successfully!");
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Delete failed.";
-			toast.error(message);
-		} finally {
-			setDeleting(false);
-		}
-	};
+      if (!avatarFile) {
+        toast.error("No avatar found to delete.");
+        return;
+      }
 
-	if (isLoading) {
-		return (
-			<div className="min-h-screen flex items-center justify-center bg-slate-50">
-				<p className="text-muted-foreground animate-pulse">Loading secure session...</p>
-			</div>
-		);
-	}
+      const { error: deleteError } = await supabase.storage
+        .from(BUCKET_NAME)
+        .remove([`${userId}/${avatarFile.name}`]);
 
-	return (
-		<div className="min-h-screen bg-slate-50 px-4 py-10 text-foreground sm:px-6 lg:px-8">
-			<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-				
-				{/* Header */}
-				<div className="flex items-center justify-between gap-3 rounded-2xl border bg-background p-4 shadow-sm">
-					<div>
-						<p className="text-sm text-muted-foreground">Profile Settings</p>
-						<h1 className="text-2xl font-semibold tracking-tight">Manage Avatar</h1>
-					</div>
-					<Button variant="outline" onClick={() => router.push("/dashboard")}>
-						<ArrowRight className="mr-2 size-4" />
-						Dashboard
-					</Button>
-				</div>
+      if (deleteError) throw deleteError;
 
-				<div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-					{/* Left Side: Upload Controls */}
-					<Card className="shadow-sm">
-						<CardHeader>
-							<CardTitle>{currentAvatarUrl ? "Update Avatar" : "Upload Avatar"}</CardTitle>
-							<CardDescription>
-								Apna naya avatar select karein. Max size 5MB hona chahiye.
-							</CardDescription>
-						</CardHeader>
-						<CardContent className="space-y-5">
-							<div className="grid gap-2">
-								<Input
-									id="avatar-file"
-									type="file"
-									accept="image/*"
-									onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
-									disabled={uploading || deleting}
-								/>
-							</div>
+      setCurrentAvatarUrl(null);
+      toast.success("Avatar deleted successfully!");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Delete failed.";
+      toast.error(message);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
-							{error && (
-								<div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-									<AlertCircle className="size-4" />
-									{error}
-								</div>
-							)}
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <p className="text-muted-foreground animate-pulse">
+          Loading secure session...
+        </p>
+      </div>
+    );
+  }
 
-							<div className="flex flex-wrap gap-3 pt-2">
-								<Button onClick={handleUpload} disabled={uploading || !file || deleting}>
-									<UploadCloud className="mr-2 size-4" />
-									{uploading ? "Saving..." : currentAvatarUrl ? "Update Image" : "Upload New"}
-								</Button>
+  return (
+    <div className="min-h-screen bg-slate-50 px-4 py-10 text-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 rounded-2xl border bg-background p-4 shadow-sm">
+          <div>
+            <p className="text-sm text-muted-foreground">Profile Settings</p>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Manage Avatar
+            </h1>
+          </div>
+          <Button variant="outline" onClick={() => router.push("/dashboard")}>
+            <ArrowRight className="mr-2 size-4" />
+            Dashboard
+          </Button>
+        </div>
 
-								{currentAvatarUrl && (
-									<Button variant="destructive" onClick={handleDelete} disabled={uploading || deleting}>
-										<Trash2 className="mr-2 size-4" />
-										{deleting ? "Deleting..." : "Delete Avatar"}
-									</Button>
-								)}
-							</div>
-						</CardContent>
-					</Card>
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          {/* Left Side: Upload Controls */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle>
+                {currentAvatarUrl ? "Update Avatar" : "Upload Avatar"}
+              </CardTitle>
+              <CardDescription>
+                Select new Avatar ...max size is 5MB..
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid gap-2">
+                <Input
+                  id="avatar-file"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    handleFileChange(e.target.files?.[0] ?? null)
+                  }
+                  disabled={uploading || deleting}
+                  className="h-auto py-2 file:mr-4 file:rounded-md file:border-0 file:bg-black file:px-3 file:py-2 file:text-sm file:font-medium file:text-white cursor-pointer"
+                />
+              </div>
 
-					{/* Right Side: Live CRUD Preview */}
-					<Card className="shadow-sm">
-						<CardHeader>
-							<CardTitle>Avatar Live Status</CardTitle>
-							<CardDescription>Aapka current active ya selected preview media.</CardDescription>
-						</CardHeader>
-						<CardContent className="flex flex-col items-center justify-center gap-4 min-h-[260px]">
-							
-							{/* Pehle priority Preview ko milegi, phir Active Avatar ko, warna Fallback placeholder */}
-							{previewUrl ? (
-								<div className="text-center">
-									<Image
-										src={previewUrl}
-										alt="New preview"
-										width={160}
-										height={160}
-										unoptimized
-										className="aspect-square w-40 rounded-full border-4 border-blue-500 object-cover shadow"
-									/>
-									<p className="text-xs text-blue-600 font-medium mt-2">New Selection (Unsaved)</p>
-								</div>
-							) : currentAvatarUrl ? (
-								<div className="text-center">
-									<Image
-										src={currentAvatarUrl}
-										alt="Current active avatar"
-										width={160}
-										height={160}
-										unoptimized
-										className="aspect-square w-40 rounded-full border-4 border-emerald-500 object-cover shadow"
-									/>
-									<p className="text-xs text-emerald-600 font-medium mt-2">Active Live Avatar</p>
-								</div>
-							) : (
-								<div className="flex aspect-square w-40 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground">
-									<div className="text-center">
-										<UserCircle2 className="mx-auto size-12 opacity-40" />
-										<p className="text-xs mt-1">No Profile Pic</p>
-									</div>
-								</div>
-							)}
+              {error && (
+                <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <AlertCircle className="size-4" />
+                  {error}
+                </div>
+              )}
 
-							<div className="text-center text-xs text-muted-foreground mt-4 border-t pt-4 w-full">
-								Signed in: <span className="font-semibold text-foreground">{email}</span>
-							</div>
-						</CardContent>
-					</Card>
-				</div>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button
+                  onClick={handleUpload}
+                  disabled={uploading || !file || deleting}
+                >
+                  <UploadCloud className="mr-2 size-4" />
+                  {uploading
+                    ? "Saving..."
+                    : currentAvatarUrl
+                      ? "Update Image"
+                      : "Upload New"}
+                </Button>
 
-			</div>
-		</div>
-	);
+                {currentAvatarUrl && (
+                  <Button
+                    variant="destructive"
+                    onClick={handleDelete}
+                    disabled={uploading || deleting}
+                  >
+                    <Trash2 className="mr-2 size-4" />
+                    {deleting ? "Deleting..." : "Delete Avatar"}
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Right Side: Live CRUD Preview */}
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle>Avatar Live Status</CardTitle>
+              <CardDescription>
+                Aapka current active ya selected preview media.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center gap-4 min-h-[260px]">
+              {/* Pehle priority Preview ko milegi, phir Active Avatar ko, warna Fallback placeholder */}
+              {previewUrl ? (
+                <div className="text-center">
+                  <Image
+                    src={previewUrl}
+                    alt="New preview"
+                    width={160}
+                    height={160}
+                    unoptimized
+                    className="aspect-square w-40 rounded-full border-4 border-blue-500 object-cover shadow"
+                  />
+                  <p className="text-xs text-blue-600 font-medium mt-2">
+                    New Selection (Unsaved)
+                  </p>
+                </div>
+              ) : currentAvatarUrl ? (
+                <div className="text-center">
+                  <Image
+                    src={currentAvatarUrl}
+                    alt="Current active avatar"
+                    width={160}
+                    height={160}
+                    unoptimized
+                    className="aspect-square w-40 rounded-full border-4 border-emerald-500 object-cover shadow"
+                  />
+                  <p className="text-xs text-emerald-600 font-medium mt-2">
+                    Active Live Avatar
+                  </p>
+                </div>
+              ) : (
+                <div className="flex aspect-square w-40 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground">
+                  <div className="text-center">
+                    <UserCircle2 className="mx-auto size-12 opacity-40" />
+                    <p className="text-xs mt-1">No Profile Pic</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="text-center text-xs text-muted-foreground mt-4 border-t pt-4 w-full">
+                Signed in:{" "}
+                <span className="font-semibold text-foreground">{email}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
 }
