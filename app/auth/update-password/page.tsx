@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabase";
@@ -17,18 +18,66 @@ export default function UpdatePassword() {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [checkingSession, setCheckingSession] = useState<boolean>(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Route security layer
   useEffect(() => {
-    // Check karein ke kiya user authenticated link se hi aaya hai
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        toast.error("Session expired or invalid token. Please request reset link again.");
-        router.push("/forgot-password");
+    let isMounted = true;
+
+    async function bootstrapRecoverySession() {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        if (isMounted) {
+          setCheckingSession(false);
+        }
+        return;
       }
-    });
-  }, [router]);
+
+      const code = searchParams.get("code");
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
+
+      try {
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+          if (error) {
+            throw error;
+          }
+        } else if (tokenHash && type === "recovery") {
+          const { error } = await supabase.auth.verifyOtp({
+            type: "recovery",
+            token_hash: tokenHash,
+          });
+
+          if (error) {
+            throw error;
+          }
+        }
+
+        const { data: { session: refreshedSession } } = await supabase.auth.getSession();
+
+        if (!refreshedSession) {
+          throw new Error("Recovery session could not be established.");
+        }
+      } catch {
+        toast.error("Session expired or invalid token. Please request reset link again.");
+        router.replace("/forgot");
+      } finally {
+        if (isMounted) {
+          setCheckingSession(false);
+        }
+      }
+    }
+
+    void bootstrapRecoverySession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [router, searchParams]);
 
   async function handleUpdatePassword(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -52,7 +101,7 @@ export default function UpdatePassword() {
         toast.error(`Failed to update password: ${error.message}`);
       } else {
         toast.success("Password changed successfully! Logging you in...");
-        router.push("/dashboard");
+        router.replace("/dashboard");
       }
     } catch (err) {
       toast.error("An unexpected error occurred. Please try again.");
@@ -64,6 +113,12 @@ export default function UpdatePassword() {
   return (
     <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center p-8">
       <div className="w-full max-w-md space-y-8">
+        {checkingSession ? (
+          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+            Verifying recovery session...
+          </div>
+        ) : null}
+
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Set new password</h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">Must be at least 6 characters.</p>

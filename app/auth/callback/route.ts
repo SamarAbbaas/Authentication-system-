@@ -5,14 +5,9 @@ import { createServerClient } from '@supabase/ssr';
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  
-  // Agar aapka dashboard lowercase me hai to '/dashboard', 
-  // agar folder Capital hai to '/Dashboard' check kar lein
+  const tokenHash = searchParams.get('token_hash');
+  const type = searchParams.get('type');
   const next = searchParams.get('next') ?? '/dashboard';
-
-  if (!code) {
-    return NextResponse.redirect(`${origin}/`);
-  }
 
   const cookieStore = await cookies();
 
@@ -38,18 +33,29 @@ export async function GET(request: Request) {
   );
 
   try {
-    const { error } = await supabaseServer.auth.exchangeCodeForSession(code);
+    if (code) {
+      const { error } = await supabaseServer.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      // Success! Redirect to your post-login page
-      return NextResponse.redirect(`${origin}${next}`);
+      if (!error) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+
+      console.error("Supabase Session Exchange Error:", error.message);
+    } else if (tokenHash && type) {
+      const { error } = await supabaseServer.auth.verifyOtp({
+        type: type as 'recovery' | 'email' | 'signup' | 'invite' | 'magiclink',
+        token_hash: tokenHash,
+      });
+
+      if (!error) {
+        return NextResponse.redirect(`${origin}${next}`);
+      }
+
+      console.error("Supabase OTP Verification Error:", error.message);
     }
-
-    console.error("Supabase Session Exchange Error:", error.message);
   } catch (err) {
     console.error("Unexpected Auth Callback Error:", err);
   }
 
-  // 404 se bachne ke liye safe fallback: direct origin (root page) par send karein
-  return NextResponse.redirect(`${origin}/`);
+  return NextResponse.redirect(`${origin}/forgot`);
 }

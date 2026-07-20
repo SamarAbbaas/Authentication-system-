@@ -34,19 +34,17 @@ export default function ForgotPassword() {
   async function handleResetRequest(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (email.length < 5) {
+    if (email.trim().length < 5) {
       return toast.error("Please enter a valid email address");
     }
 
     setLoading(true);
 
     try {
-      // Dynamic origin path setup (jaise login page par hai)
       const targetOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        // Yeh URL user ko password update karne wale route par le kar jayega
-        redirectTo: `${targetOrigin}/auth/update-password`,
+        redirectTo: `${targetOrigin}/auth/callback?next=/auth/update-password`,
       });
 
       if (error) {
@@ -119,7 +117,7 @@ export default function ForgotPassword() {
               We have sent a password reset link to <strong className="text-gray-900 dark:text-white">{email}</strong>. 
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500">
-            i have not receive the email? Check your spam folder or try again.
+              If you do not receive the email, check your spam folder or try again.
             </p>
             <button 
               onClick={() => setIsSubmitted(false)}
