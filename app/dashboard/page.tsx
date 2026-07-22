@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Upload, ExternalLink, UserCircle2 } from 'lucide-react';
+import { Upload, UserCircle2 } from 'lucide-react';
+import ThemeToggle from '../themetoggler/page';
 
 // Shadcn UI Dialog Imports
 import {
@@ -86,7 +87,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <p className="text-muted-foreground animate-pulse">Loading dashboard...</p>
       </div>
     );
@@ -103,48 +104,48 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden p-4 bg-slate-50">
-      <div className="relative w-full max-w-2xl rounded-3xl border bg-background/85 p-6 shadow-2xl backdrop-blur sm:p-8">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.14),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.06),_transparent_35%)]" />
+      <div className="relative w-full max-w-2xl rounded-3xl border bg-card/90 p-6 shadow-2xl backdrop-blur sm:p-8">
         <div className="flex flex-col gap-6">
           
           {/* Header Section with Profile Layout */}
-          <div className="flex items-center justify-between border-b pb-4">
+          <div className="flex items-center justify-between gap-4 border-b pb-4">
             <div>
               <p className="text-sm uppercase font-bold">Welcome Back</p>
               {user && <p className="mt-1 text-sm text-muted-foreground">{user.email} To </p>} 
               <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
             </div>
 
-            {/* Global Avatar Circle Indicator with Shadcn Dialog (Solution 2 Applied) */}
-            <div className="flex flex-col items-center gap-1">
-              {imageUrl ? (
-                <Dialog>
-                  {/* asChild remove kar diya aur core classes direct trigger par laga di hain */}
-                  <DialogTrigger className="size-16 rounded-full border-2 border-emerald-500 overflow-hidden shadow-sm ring-4 ring-emerald-50 cursor-pointer hover:opacity-90 transition-opacity focus:outline-none">
-                    <img 
-                      src={imageUrl} 
-                      alt="Global Avatar" 
-                      className="h-full w-full object-cover"
-                    />
-                  </DialogTrigger>
-                  
-                  {/* Zoomed view setup */}
-                  <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
-                    {/* Accessibility ke liye hidden title */}
-                    <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <div className="flex flex-col items-center gap-1">
+                {imageUrl ? (
+                  <Dialog>
+                    <DialogTrigger className="size-16 rounded-full border-2 border-emerald-500 overflow-hidden shadow-sm ring-4 ring-emerald-50 cursor-pointer hover:opacity-90 transition-opacity focus:outline-none dark:ring-emerald-950">
+                      <img 
+                        src={imageUrl} 
+                        alt="Global Avatar" 
+                        className="h-full w-full object-cover"
+                      />
+                    </DialogTrigger>
                     
-                    <img 
-                      src={imageUrl} 
-                      alt="Avatar Expanded" 
-                      className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
-                    />
-                  </DialogContent>
-                </Dialog>
-              ) : (
-                <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground shadow-sm">
-                  <UserCircle2 className="size-8 opacity-40" />
-                </div>
-              )}
+                    <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
+                      <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
+                      
+                      <img 
+                        src={imageUrl} 
+                        alt="Avatar Expanded" 
+                        className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
+                      />
+                    </DialogContent>
+                  </Dialog>
+                ) : (
+                  <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground shadow-sm">
+                    <UserCircle2 className="size-8 opacity-40" />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

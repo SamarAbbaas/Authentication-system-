@@ -1,41 +1,26 @@
 "use client";
 
 import { Icon } from "@iconify/react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-type Theme = "light" | "dark";
-
-function getInitialTheme(): Theme {
-	if (typeof window === "undefined") return "light";
-	const saved = localStorage.getItem("theme");
-	if (saved === "light" || saved === "dark") return saved;
-	return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
 export default function ThemeToggle() {
-	const [theme, setTheme] = useState<Theme>("light");
 	const [mounted, setMounted] = useState(false);
+	const { theme, setTheme } = useTheme();
 
 	useEffect(() => {
-		const initial = getInitialTheme();
-		// eslint-disable-next-line react-hooks/set-state-in-effect
-		setTheme(initial);
-		document.documentElement.classList.toggle("dark", initial === "dark");
 		setMounted(true);
 	}, []);
 
 	const toggleTheme = () => {
-		const nextTheme: Theme = theme === "dark" ? "light" : "dark";
-		setTheme(nextTheme);
-		localStorage.setItem("theme", nextTheme);
-		document.documentElement.classList.toggle("dark", nextTheme === "dark");
+		setTheme(theme === "dark" ? "light" : "dark");
 	};
 
 	if (!mounted) {
 		return (
 			<button
 				type="button"
-				className="rounded-md border px-3 py-2 text-sm"
+				className="inline-flex items-center justify-center rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground shadow-sm"
 				aria-label="Toggle theme"
 			>
 				Theme
@@ -47,7 +32,7 @@ export default function ThemeToggle() {
 		<button
 			type="button"
 			onClick={toggleTheme}
-			className="rounded-md border px-3 py-2 text-sm text-muted-foreground"
+			className="inline-flex size-10 items-center justify-center rounded-md border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
 			aria-label="Toggle theme"
 		>
 			{theme === "dark" ? <Icon icon="iconoir:sun-light" width="24" height="24" /> : <Icon icon="solar:moon-linear" width="24" height="24" />}
