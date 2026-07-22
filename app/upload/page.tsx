@@ -507,7 +507,7 @@ export default function UploadPage() {
           <div>
             <p className="text-sm text-muted-foreground">Profile Settings</p>
             <h1 className="text-2xl font-semibold tracking-tight">
-              Manage Avatar
+              Manage Profile
             </h1>
           </div>
           <Button variant="outline" onClick={() => router.push("/dashboard")}>
@@ -521,10 +521,10 @@ export default function UploadPage() {
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle>
-                {currentAvatarUrl ? "Update Avatar" : "Upload Avatar"}
+                {currentAvatarUrl ? "Update Profile" : "Upload Profile"}
               </CardTitle>
               <CardDescription>
-                Select new Avatar ...max size is 5MB..
+                Select new Profile ...max size is 5MB..
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-5">
@@ -578,9 +578,9 @@ export default function UploadPage() {
           {/* Right Side: Live CRUD Preview */}
           <Card className="shadow-sm">
             <CardHeader>
-              <CardTitle>Avatar Live Status</CardTitle>
+              <CardTitle>Profile Live Status</CardTitle>
               <CardDescription>
-                Aapka current active ya selected preview media.
+              Your  selected preview media.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-4 min-h-[260px]">
@@ -610,7 +610,7 @@ export default function UploadPage() {
                     className="aspect-square w-40 rounded-full border-4 border-emerald-500 object-cover shadow"
                   />
                   <p className="text-xs text-emerald-600 font-medium mt-2">
-                    Active Live Avatar
+                    Active Live Profile
                   </p>
                 </div>
               ) : (

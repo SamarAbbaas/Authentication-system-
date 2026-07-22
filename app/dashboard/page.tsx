@@ -158,7 +158,7 @@ export default function DashboardPage() {
               className="w-full transition-transform duration-200 hover:scale-[1.02]"
             >
               <Upload className="mr-2 size-4" />
-              Manage / Update Avatar
+              Manage / Update Profile Picture
             </Button>
             <Button variant="outline" onClick={handleLogout} className="w-full">
               Logout
