@@ -6,7 +6,18 @@ import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { Upload, UserCircle2 } from 'lucide-react';
+import { 
+  Upload, 
+  UserCircle2, 
+  Home, 
+  BarChart3, 
+  Settings, 
+  LogOut, 
+  Menu, 
+  X,
+  Sparkles
+} from 'lucide-react';
+import Link from 'next/link';
 import ThemeToggle from '../themetoggler/page';
 
 // Shadcn UI Dialog Imports
@@ -17,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Bucket name hamare upload page ke mutabiq hona chahiye
+// Bucket name hamare upload page ke mutabiq
 const BUCKET_NAME = "Samar Abbas";
 
 export default function DashboardPage() {
@@ -25,11 +36,11 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Storage se avatar fetch karne ka central function
   const fetchUserAvatar = async (userId: string) => {
     try {
-      // Pehle list check karenge taake sahi filename aur extension (png, jpg, jpeg) mil sake
       const { data, error } = await supabase.storage
         .from(BUCKET_NAME)
         .list(userId);
@@ -37,7 +48,6 @@ export default function DashboardPage() {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        // UploadPage ki logic ke mutabiq file name 'avatar' se start hota hai
         const avatarFile = data.find((f) => f.name.startsWith("avatar"));
         
         if (avatarFile) {
@@ -45,7 +55,7 @@ export default function DashboardPage() {
             .from(BUCKET_NAME)
             .getPublicUrl(`${userId}/${avatarFile.name}`);
           
-          // ?t= lagaya hai taake agar user profile update karke wapas aaye to fresh image dikhe (Cache breaking)
+          // Cache breaking query parameter
           setImageUrl(`${urlData.publicUrl}?t=${Date.now()}`);
         } else {
           setImageUrl(null);
@@ -65,7 +75,6 @@ export default function DashboardPage() {
         router.push('/signin');
       } else {
         setUser(session.user);
-        // User milte hi image automatically fetch ho jayegi
         await fetchUserAvatar(session.user.id);
       }
       setLoading(false);
@@ -85,14 +94,6 @@ export default function DashboardPage() {
     return () => subscription.unsubscribe();
   }, [router]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <p className="text-muted-foreground animate-pulse">Loading dashboard...</p>
-      </div>
-    );
-  }
-
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -103,70 +104,254 @@ export default function DashboardPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <p className="text-muted-foreground animate-pulse font-medium">Loading dashboard...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
-        <div className="absolute top-[50vh] right-[50vw] h-screen w-screen bg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
-      <div className="absolute bottom-[50vh] left-[50vw] h-screen w-screen bg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.14),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.06),_transparent_35%)]" />
-      <div className="relative w-full max-w-2xl rounded-3xl border bg-card/90 p-6 shadow-2xl backdrop-blur sm:p-8">
-        <div className="flex flex-col gap-6">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Dynamic Background Effects */}
+      <div className="absolute top-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
+
+      {/* ==================== ATTRACTIVE NAVBAR ==================== */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl transition-all">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           
-          {/* Header Section with Profile Layout */}
-          <div className="flex items-center justify-between gap-4 border-b pb-4">
-            <div>
-              <p className="text-sm uppercase font-bold">Welcome Back</p>
-              {user && <p className="mt-1 text-sm text-muted-foreground">{user.email} To </p>} 
-              <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+          {/* Logo / Brand Name */}
+          <Link href="/dashboard" className="flex items-center gap-2 group">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105">
+              <Sparkles className="size-5" />
+            </div>
+            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-indigo-950 to-gray-700 dark:from-white dark:via-indigo-200 dark:to-gray-400 bg-clip-text text-transparent">
+              DevPortal
+            </span>
+          </Link>
+
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 rounded-full border border-border/50 bg-muted/40 px-3 py-1.5 shadow-inner">
+            <Link 
+              href="/dashboard" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors hover:bg-background hover:text-primary text-foreground"
+            >
+              <Home className="size-4" />
+              Home
+            </Link>
+            <Link 
+              href="/analytics" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              <BarChart3 className="size-4" />
+              Analytics
+            </Link>
+            <Link 
+              href="/settings" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              <Settings className="size-4" />
+              Settings
+            </Link>
+          </nav>
+
+          {/* Right Controls (Theme, Avatar & Logout) */}
+          <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
+
+            {/* Profile Picture Avatar & Modal Dialog */}
+            {imageUrl ? (
+              <Dialog>
+                <DialogTrigger className="relative group focus:outline-none">
+                  <div className="size-10 rounded-full border-2 border-indigo-500/80 p-[1px] shadow-sm transition-transform group-hover:scale-105 dark:border-indigo-400">
+                    <img 
+                      src={imageUrl} 
+                      alt="User Avatar" 
+                      className="h-full w-full rounded-full object-cover"
+                    />
+                  </div>
+                  <span className="absolute bottom-0 right-0 size-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
+                </DialogTrigger>
+
+                <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
+                  <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
+                  <img 
+                    src={imageUrl} 
+                    alt="Avatar Expanded" 
+                    className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
+                  />
+                </DialogContent>
+              </Dialog>
+            ) : (
+              <Link href="/upload">
+                <div className="flex size-10 items-center justify-center rounded-full border border-dashed border-border bg-muted/50 text-muted-foreground transition-colors hover:bg-muted">
+                  <UserCircle2 className="size-6" />
+                </div>
+              </Link>
+            )}
+
+            {/* Functional Logout Button */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+            >
+              <LogOut className="size-4" />
+              Logout
+            </Button>
+          </div>
+
+          {/* Mobile Hamburger Button */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="rounded-lg p-2 text-muted-foreground hover:bg-muted focus:outline-none"
+            >
+              {mobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Dropdown Navigation */}
+        {mobileMenuOpen && (
+          <div className="border-b border-border bg-background/95 p-4 backdrop-blur-lg md:hidden space-y-3">
+            {/* User Profile Summary in Mobile Menu */}
+            <div className="flex items-center gap-3 border-b border-border pb-3">
+              {imageUrl ? (
+                <img src={imageUrl} alt="Avatar" className="size-10 rounded-full object-cover border border-indigo-500" />
+              ) : (
+                <UserCircle2 className="size-10 text-muted-foreground" />
+              )}
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold truncate max-w-[200px]">{user?.email}</span>
+                <span className="text-xs text-muted-foreground">Logged In</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <div className="flex flex-col items-center gap-1">
-                {imageUrl ? (
-                  <Dialog>
-                    <DialogTrigger className="size-16 rounded-full border-2 border-emerald-500 overflow-hidden shadow-sm ring-4 ring-emerald-50 cursor-pointer hover:opacity-90 transition-opacity focus:outline-none dark:ring-emerald-950">
-                      <img 
-                        src={imageUrl} 
-                        alt="Global Avatar" 
-                        className="h-full w-full object-cover"
-                      />
-                    </DialogTrigger>
-                    
-                    <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
-                      <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
-                      
-                      <img 
-                        src={imageUrl} 
-                        alt="Avatar Expanded" 
-                        className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
-                      />
-                    </DialogContent>
-                  </Dialog>
-                ) : (
-                  <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground shadow-sm">
-                    <UserCircle2 className="size-8 opacity-40" />
-                  </div>
-                )}
+            <nav className="flex flex-col gap-1">
+              <Link 
+                href="/dashboard" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <Home className="size-4 text-indigo-500" />
+                Home
+              </Link>
+              <Link 
+                href="/analytics" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <BarChart3 className="size-4 text-indigo-500" />
+                Analytics
+              </Link>
+              <Link 
+                href="/settings" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <Settings className="size-4 text-indigo-500" />
+                Settings
+              </Link>
+              <Link 
+                href="/upload" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <Upload className="size-4 text-indigo-500" />
+                Manage Profile Picture
+              </Link>
+            </nav>
+
+            <Button 
+              variant="destructive" 
+              onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+              className="w-full flex items-center justify-center gap-2 mt-2"
+            >
+              <LogOut className="size-4" />
+              Logout
+            </Button>
+          </div>
+        )}
+      </header>
+
+      {/* ==================== MAIN DASHBOARD CONTENT ==================== */}
+      <main className="relative mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="relative w-full rounded-3xl border border-border/60 bg-card/80 p-6 shadow-xl backdrop-blur-md sm:p-10 space-y-8">
+          
+          {/* Welcome Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border/50 pb-6">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
+                User Portal
+              </span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Dashboard</h1>
+              {user && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Welcome back, <strong className="text-foreground">{user.email}</strong>
+                </p>
+              )}
+            </div>
+
+            {/* Profile Avatar Card in Dashboard */}
+            <div className="flex items-center gap-4 bg-muted/30 p-3 rounded-2xl border border-border/40">
+              {imageUrl ? (
+                <Dialog>
+                  <DialogTrigger className="size-16 rounded-full border-2 border-indigo-500 overflow-hidden shadow-md cursor-pointer hover:opacity-90 transition-opacity focus:outline-none">
+                    <img 
+                      src={imageUrl} 
+                      alt="Global Avatar" 
+                      className="h-full w-full object-cover"
+                    />
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
+                    <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
+                    <img 
+                      src={imageUrl} 
+                      alt="Avatar Expanded" 
+                      className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
+                    />
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed bg-muted text-muted-foreground shadow-sm">
+                  <UserCircle2 className="size-8 opacity-40" />
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="text-xs font-medium text-muted-foreground">Profile Status</span>
+                <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  {imageUrl ? "Custom Avatar Active" : "Default Avatar"}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Navigation Controls */}
+          {/* Quick Actions Grid */}
           <div className="grid gap-4 sm:grid-cols-2">
             <Button 
               onClick={() => router.push('/upload')} 
-              className="w-full transition-transform duration-200 hover:scale-[1.02]"
+              className="w-full py-6 text-base font-semibold transition-all hover:scale-[1.01] shadow-lg shadow-indigo-500/10"
             >
-              <Upload className="mr-2 size-4" />
+              <Upload className="mr-2 size-5" />
               Manage / Update Profile Picture
             </Button>
-            <Button variant="outline" onClick={handleLogout} className="w-full">
-              Logout
+            <Button 
+              variant="outline" 
+              onClick={handleLogout} 
+              className="w-full py-6 text-base font-semibold text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive transition-all"
+            >
+              <LogOut className="mr-2 size-5" />
+              Logout Account
             </Button>
           </div>
-          
+
         </div>
-      </div>
+      </main>
     </div>
   );
 }
