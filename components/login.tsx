@@ -107,13 +107,11 @@ export default function Login() {
   async function handleOAuthLogin(provider: "google") {
     setLoading(true);
     try {
-      // dynamic window origin setup to prevent local fallback failures
       const targetOrigin = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000";
       
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
-          // Standard production path for nextjs middleware tokens
           redirectTo: `${targetOrigin}/auth/callback?next=/dashboard`,
           skipBrowserRedirect: false
         },
@@ -134,29 +132,15 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
-      {/* Left side - Image/Branding */}
-      {/* <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-500 dark:via-purple-500 dark:to-pink-500 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative z-10 flex flex-col justify-center items-center text-white p-12">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-8">
-            <ShieldIcon />
-          </div>
-          <h1 className="text-4xl font-bold mb-4 text-center">Secure Access</h1>
-          <p className="text-xl text-center text-white/90 max-w-md">
-            Your trusted platform for secure authentication and seamless user experience.
-          </p>
-          <div className="mt-12 grid grid-cols-3 gap-4 opacity-60">
-            {[...Array(9)].map((_, i) => (
-              <div key={i} className="w-2 h-2 bg-white/40 rounded-full"></div>
-            ))}
-          </div>
-        </div>
-      </div> */}
+    <div className="relative min-h-screen bg-white dark:bg-black flex items-center justify-center overflow-hidden">
+      {/* Top Right Corner Glow */}
+      <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 h-72 w-72 sm:h-96 sm:w-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Right side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+      {/* Bottom Left Corner Glow */}
+      <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 h-72 w-72 sm:h-96 sm:w-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="relative z-10 w-full max-w-md p-8">
+        <div className="w-full space-y-8">
           {/* Header */}
           <div className="text-center">
             <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-500 dark:to-purple-500 rounded-xl flex items-center justify-center mx-auto mb-6 text-white">

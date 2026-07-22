@@ -105,6 +105,8 @@ export default function DashboardPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+        <div className="absolute top-[50vh] right-[50vw] h-screen w-screen bg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
+      <div className="absolute bottom-[50vh] left-[50vw] h-screen w-screen bg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.18),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.08),_transparent_35%)] dark:bg-[radial-gradient(circle_at_top,_rgba(148,163,184,0.14),_transparent_40%),radial-gradient(circle_at_bottom_right,_rgba(255,255,255,0.06),_transparent_35%)]" />
       <div className="relative w-full max-w-2xl rounded-3xl border bg-card/90 p-6 shadow-2xl backdrop-blur sm:p-8">
         <div className="flex flex-col gap-6">

@@ -78,6 +78,8 @@ const FloatingLabelInput: React.FC<{
 
   return (
     <div className="relative group w-full">
+        <div className="absolute top-[50vh] right-[50vw] h-screen w-screen bg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
+      <div className="absolute bottom-[50vh] left-[50vw] h-screen w-screenbg-sidebar-primary opacity-10 rounded-2xl blur-3xl"></div>
       {/* Left Icon */}
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground transition-colors group-focus-within:text-foreground">
         {icon}
