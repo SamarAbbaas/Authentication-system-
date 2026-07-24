@@ -105,10 +105,15 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return (
+    return (<>  
+       
+
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="w-5 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+        
         <p className="text-muted-foreground animate-pulse font-medium">Loading dashboard...</p>
       </div>
+      </>
     );
   }
 

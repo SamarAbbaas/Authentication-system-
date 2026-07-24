@@ -96,7 +96,7 @@ const Newsletter = () => {
               <Link href='/signup'>Signup</Link>
             </button>
             <button 
-                      className="w-full sm:w-auto px-6 py-3 bg-black  text-gray-100 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
+                         className="w-full sm:w-auto px-6 py-3 bg-yellow-400 dark:bg-yellow-500 text-gray-900 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
               <Link href='/signin'>Signin</Link>
             </button>
           </div>
