@@ -3,6 +3,7 @@
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
@@ -15,7 +16,10 @@ import {
   LogOut, 
   Menu, 
   X,
-  Sparkles
+  Sparkles,
+  SendHorizonal,
+  Bot,
+  LoaderCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import ThemeToggle from '../themetoggler/page';
@@ -33,10 +37,15 @@ const BUCKET_NAME = "Samar Abbas";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || 'DevPortal';
+  const agentEnabled = process.env.NEXT_PUBLIC_AGENT_ENABLED === 'true';
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [agentPrompt, setAgentPrompt] = useState('');
+  const [agentReply, setAgentReply] = useState('');
+  const [agentLoading, setAgentLoading] = useState(false);
 
   // Storage se avatar fetch karne ka central function
   const fetchUserAvatar = async (userId: string) => {
@@ -104,6 +113,41 @@ export default function DashboardPage() {
     }
   };
 
+  const handleAgentSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!agentPrompt.trim()) {
+      toast.error('Please enter a prompt for the assistant.');
+      return;
+    }
+
+    setAgentLoading(true);
+    setAgentReply('');
+
+    try {
+      const response = await fetch('/api/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: agentPrompt }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Assistant request failed');
+      }
+
+      setAgentReply(data.reply || 'No response generated.');
+      setAgentPrompt('');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Something went wrong';
+      setAgentReply(message);
+      toast.error(message);
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
   if (loading) {
     return (<>  
        
@@ -133,7 +177,7 @@ export default function DashboardPage() {
               <Sparkles className="size-5" />
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-indigo-950 to-gray-700 dark:from-white dark:via-indigo-200 dark:to-gray-400 bg-clip-text text-transparent">
-              DevPortal
+              {appName}
             </span>
           </Link>
 
@@ -353,6 +397,60 @@ export default function DashboardPage() {
               <LogOut className="mr-2 size-5" />
               Logout Account
             </Button>
+          </div>
+
+          <div className="rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-background to-purple-500/10 p-5 shadow-inner sm:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-600/15 text-indigo-600 dark:text-indigo-300">
+                <Bot className="size-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">AI Assistant</h2>
+                <p className="text-sm text-muted-foreground">
+                  {agentEnabled
+                    ? 'Ask for help, ideas, or quick coding support from your dashboard.'
+                    : 'Assistant is currently disabled. Enable it from your environment variables.'}
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAgentSubmit} className="space-y-3">
+              <Input
+                value={agentPrompt}
+                onChange={(event) => setAgentPrompt(event.target.value)}
+                placeholder="Ask your assistant anything..."
+                className="h-12 rounded-2xl border-border/70 bg-background/80 px-4 text-sm shadow-sm"
+              />
+              <Button type="submit" className="w-full sm:w-auto" disabled={agentLoading}>
+                {agentLoading ? (
+                  <>
+                    <LoaderCircle className="mr-2 size-4 animate-spin" />
+                    Thinking...
+                  </>
+                ) : (
+                  <>
+                    <SendHorizonal className="mr-2 size-4" />
+                    Send
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-4 rounded-2xl border border-border/60 bg-background/70 p-4 text-sm text-muted-foreground shadow-sm">
+              {agentLoading ? (
+                <div className="flex items-center gap-2 text-foreground">
+                  <LoaderCircle className="size-4 animate-spin" />
+                  Generating a helpful response...
+                </div>
+              ) : agentReply ? (
+                <div className="leading-7 text-foreground">
+                  <p className="mb-2 font-medium text-indigo-600 dark:text-indigo-400">Assistant reply</p>
+                  <p className="whitespace-pre-line">{agentReply}</p>
+                </div>
+              ) : (
+                <p>Try a prompt like: “Help me summarize my project goals” or “Suggest a clean UI improvement for this dashboard”.</p>
+              )}
+            </div>
           </div>
 
         </div>
