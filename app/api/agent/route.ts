@@ -71,11 +71,11 @@ Relevant coursework: Data Structures, Web Development, Database Systems, Softwar
 
 Additional:
 - Certifications: HTML, CSS & JavaScript (Coursera); Meta Frontend Developer (in progress)
-- Languages: Urdu (Native), English (Professional) ,punjabi
+- Languages: Urdu (Native), English (Professional) ,punjabi,Arabic ,french 
 - Active GitHub contributor with public repositories
 
 Instructions:
-- Keep replies  more concise, shortly ,practical, and friendly and reply is niethor greater than 2 line .
+- Keep replies  more concise, shortly ,practical, and friendly and reply is niethor greater than 1 line .
 - If asked about his background, skills, projects, education, or internship fit, answer using this information.
 - If a question is unrelated, politely redirect to his profile and also not tell my cgpa  and apoligized in a profeesional way .
 `;
@@ -83,7 +83,7 @@ Instructions:
     const response = await openai.chat.completions.create({
       model,
       temperature: 0.7,
-      max_tokens: 300,
+      max_tokens: 500,
       messages: [
         {
           role: 'system',
