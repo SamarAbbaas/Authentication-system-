@@ -1,11 +1,11 @@
 'use client';
 
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { 
   Upload, 
@@ -38,6 +38,7 @@ const BUCKET_NAME = "Samar Abbas";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const appName = process.env.NEXT_PUBLIC_APP_NAME || 'DevPortal';
   const agentEnabled = process.env.NEXT_PUBLIC_AGENT_ENABLED === 'true';
   const [user, setUser] = useState<User | null>(null);
@@ -47,7 +48,14 @@ export default function DashboardPage() {
   const [agentPrompt, setAgentPrompt] = useState('');
   const [agentReply, setAgentReply] = useState('');
   const [agentLoading, setAgentLoading] = useState(false);
-  const isAdmin = user?.app_metadata?.role === 'admin';
+  const unauthorizedToastShown = useRef(false);
+
+  useEffect(() => {
+    if (searchParams.get('unauthorized') === 'admin' && !unauthorizedToastShown.current) {
+      toast.error('Admin access only. You are not authorized to open this page.');
+      unauthorizedToastShown.current = true;
+    }
+  }, [searchParams]);
 
   // Storage se avatar fetch karne ka central function
   const fetchUserAvatar = async (userId: string) => {
@@ -206,15 +214,13 @@ export default function DashboardPage() {
               <Settings className="size-4" />
               Settings
             </Link>
-            {isAdmin && (
-              <Link 
-                href="/admin/logs" 
-                className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
-              >
-                <Shield className="size-4" />
-                Admin Logs
-              </Link>
-            )}
+            <Link 
+              href="/admin/logs" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              <Shield className="size-4" />
+              Admin Logs
+            </Link>
           </nav>
 
           {/* Right Controls (Theme, Avatar & Logout) */}
@@ -325,16 +331,14 @@ export default function DashboardPage() {
                 <Upload className="size-4 text-indigo-500" />
                 Manage Profile Picture
               </Link>
-              {isAdmin && (
-                <Link 
-                  href="/admin/logs" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
-                >
-                  <Shield className="size-4 text-indigo-500" />
-                  Admin Logs
-                </Link>
-              )}
+              <Link 
+                href="/admin/logs" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted"
+              >
+                <Shield className="size-4 text-indigo-500" />
+                Admin Logs
+              </Link>
             </nav>
 
             <Button 

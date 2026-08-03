@@ -41,7 +41,7 @@ export async function proxy(request: NextRequest) {
     }
 
     if (session.user.app_metadata?.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      return NextResponse.redirect(new URL('/dashboard?unauthorized=admin', request.url))
     }
   }
 
