@@ -82,6 +82,20 @@ export default function Login() {
       if (error) {
         toast.error(`Error logging in: ${error.message}`);
       } else if (data.session) {
+        const signedInUser = data.user ?? data.session.user;
+
+        if (signedInUser?.id) {
+          const { error: loginLogError } = await supabase.from("user_logins").insert({
+            user_id: signedInUser.id,
+            email: signedInUser.email ?? email,
+            logged_in_at: new Date().toISOString(),
+          });
+
+          if (loginLogError) {
+            console.error("Failed to insert user login activity:", loginLogError);
+          }
+        }
+
         toast.success("Logged in successfully!");
         const session = await waitForSession(supabase);
         if (session) {

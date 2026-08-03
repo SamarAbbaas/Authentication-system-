@@ -34,6 +34,17 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  // Protect admin routes
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/signin', request.url))
+    }
+
+    if (session.user.app_metadata?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
   // Redirect signed-in users away from auth pages
   if (
     (request.nextUrl.pathname === '/signin' || 
@@ -47,6 +58,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = { 
-  matcher: ['/dashboard/:path*', '/signin', '/signup']
+  matcher: ['/dashboard/:path*', '/admin/:path*', '/signin', '/signup']
 } 
 
