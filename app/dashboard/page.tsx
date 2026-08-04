@@ -221,6 +221,13 @@ export default function DashboardPage() {
               <Shield className="size-4" />
               Admin Logs
             </Link>
+            <Link 
+              href="/admin/logs" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              {/* <Shield className="size-4" /> */}
+              Feedback
+            </Link>
           </nav>
 
           {/* Right Controls (Theme, Avatar & Logout) */}
@@ -265,7 +272,7 @@ export default function DashboardPage() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
-              <LogOut className="size-4" />
+              {/* <LogOut className="size-4" /> */}
               Logout
             </Button>
           </div>
@@ -339,6 +346,13 @@ export default function DashboardPage() {
                 <Shield className="size-4 text-indigo-500" />
                 Admin Logs
               </Link>
+              <Link 
+              href="/Feedback" 
+              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+            >
+              {/* <Shield className="size-4" />. */}
+         Feedback
+            </Link>
             </nav>
 
             <Button 
@@ -346,7 +360,7 @@ export default function DashboardPage() {
               onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
               className="w-full flex items-center justify-center gap-2 mt-2"
             >
-              <LogOut className="size-4" />
+              {/* <LogOut className="size-4" /> */}
               Logout
             </Button>
           </div>
@@ -419,7 +433,7 @@ export default function DashboardPage() {
               onClick={handleLogout} 
               className="w-full py-6 text-base font-semibold text-destructive border-destructive/20 hover:bg-destructive/10 hover:text-destructive transition-all"
             >
-              <LogOut className="mr-2 size-5" />
+              {/* <LogOut className="mr-2 size-5" /> */}
               Logout Account
             </Button>
           </div>
@@ -443,7 +457,7 @@ export default function DashboardPage() {
               <Input
                 value={agentPrompt}
                 onChange={(event) => setAgentPrompt(event.target.value)}
-                placeholder="Ask your assistant anything..."
+                placeholder="Ask to  assistant anything..."
                 className="h-12 rounded-2xl border-border/70 bg-background/80 px-4 text-sm shadow-sm"
               />
               <Button type="submit" className="w-full sm:w-auto" disabled={agentLoading}>
