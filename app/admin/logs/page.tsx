@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
@@ -14,7 +14,8 @@ import {
   Copy,
   Check,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  BookOpen
 } from 'lucide-react';
 
 type UserLoginRow = {
@@ -24,6 +25,39 @@ type UserLoginRow = {
   logged_in_at: string;
 };
 
+const QURAN_VERSES = [
+  { arabic: "إِنَّ مَعَ الْعُسْرِ يُسْرًا", urdu: "بیشک مشکل کے ساتھ آسانی ہے۔", surah: "الشرح: 6" },
+  { arabic: "وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", urdu: "اور وہ تمہارے ساتھ ہے جہاں بھی تم ہو۔", surah: "الحديد: 4" },
+  { arabic: "فَاذْكُرُونِي أَذْكُرْكُمْ", urdu: "پس تم مجھے یاد کرو، میں تمہیں یاد رکھوں گا۔", surah: "البقرة: 152" },
+  { arabic: "لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ", urdu: "اگر تم شکر ادا کرو گے تو میں تمہیں اور زیادہ دوں گا۔", surah: "إبراهيم: 7" },
+  { arabic: "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ", urdu: "بیشک اللہ صبر کرنے والوں کے ساتھ ہے۔", surah: "البقرة: 153" },
+  { arabic: "وَتَوَكَّلْ عَلَى الْحَيِّ الَّذِي لَا يَمُوتُ", urdu: "اور اس زندہ پر توکل کرو جسے کبھی موت نہیں آئے گی۔", surah: "الفرقان: 58" },
+  { arabic: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ", urdu: "سن لو! اللہ کے ذکر ہی سے دلوں کو اطمینان ملتا ہے۔", surah: "الرعد: 28" },
+  { arabic: "وَقُل رَّبِّ زِدْنِي عِلْمًا", urdu: "اور دعا کرو کہ اے میرے رب! میرے علم میں اضافہ فرما۔", surah: "طه: 114" },
+  { arabic: "إِنَّ مَعِيَ رَبِّي سَيَهْدِينِ", urdu: "بیشک میرے ساتھ میرا رب ہے، وہ مجھے ضرور راستہ دکھائے گا۔", surah: "الشعراء: 62" },
+  { arabic: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا", urdu: "اور جو اللہ سے ڈرے گا، اللہ اس کے لیے نکلنے کا راستہ بنا دے گا۔", surah: "الطلاق: 2" },
+  { arabic: "وَإِذَا مَرِضْتُ فَهُوَ يَشْفِينِ", urdu: "اور جب میں بیمار ہوتا ہوں تو وہی مجھے شفا دیتا ہے۔", surah: "الشعراء: 80" },
+  { arabic: "إِنَّ رَحْمَتَ اللَّهِ قَرِيبٌ مِّنَ الْمُحْسِنِينَ", urdu: "بیشک اللہ کی رحمت نیکی کرنے والوں کے قریب ہے۔", surah: "الأعراف: 56" },
+  { arabic: "وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ", urdu: "اور جو اللہ پر بھروسہ کرے گا، وہ اس کے لیے کافی ہے۔", surah: "الطلاق: 3" },
+  { arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الآخِرَةِ حَسَنَةً", urdu: "اے ہمارے رب! ہمیں دنیا میں بھی بھلائی دے اور آخرت میں بھی بھلائی عطا فرما۔", surah: "البقرة: 201" },
+  { arabic: "وَقُل جَاءَ الْحَقُّ وَزَهَقَ الْبَاطِلُ", urdu: "اور کہہ دو کہ حق آ گیا اور باطل مٹ گیا۔", surah: "الإسراء: 81" },
+  { arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", urdu: "ہمیں اللہ کافی ہے اور وہ بہترین کارساز ہے۔", surah: "آل عمران: 173" },
+  { arabic: "وَخُلِقَ الْإِنسَانُ ضَعِيفًا", urdu: "اور انسان کمزور پیدا کیا گیا ہے۔", surah: "النساء: 28" },
+  { arabic: "إِنَّ اللَّهَ غَفُورٌ رَّحِيمٌ", urdu: "بیشک اللہ بخشنے والا، نہایت رحم کرنے والا ہے۔", surah: "البقرة: 173" },
+  { arabic: "وَأَحْسِنُوا إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ", urdu: "اور احسان کرو، بیشک اللہ احسان کرنے والوں سے محبت کرتا ہے۔", surah: "البقرة: 195" },
+  { arabic: "إِنَّ الْحَسَنَاتِ يُذْهِبْنَ السَّيِّئَاتِ", urdu: "بیشک نیکیاں برائیوں کو مٹا دیتی ہیں۔", surah: "هود: 114" },
+  { arabic: "وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ", urdu: "اور صبر اور نماز کے ذریعے مدد چاہو۔", surah: "البقرة: 45" },
+  { arabic: "وَاللَّهُ يَعْلَمُ وَأَنتُمْ لَا تَعْلَمُونَ", urdu: "اور اللہ جانتا ہے اور تم نہیں جانتے۔", surah: "البقرة: 216" },
+  { arabic: "فَابْتَغُوا عِندَ اللَّهِ الرِّزْقَ", urdu: "پس تم اللہ ہی کے پاس رزق تلاش کرو۔", surah: "العنكبوت: 17" },
+  { arabic: "فَسَيَكْفِيكَهُمُ اللَّهُ", urdu: "پس ان کے مقابلے میں اللہ تمہیں کافی ہوگا۔", surah: "البقرة: 137" },
+  { arabic: "وَاللَّهُ غَالِبٌ عَلَى أَمْرِهِ", urdu: "اور اللہ اپنے کام پر غالب ہے۔", surah: "يوسف: 21" },
+  { arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي", urdu: "اے میرے رب! میرا سینہ کھول دے اور میرے کام کو آسان کر دے۔", surah: "طه: 25-26" },
+  { arabic: "إِنَّ أَكْرَمَكُمْ عِندَ اللَّهِ أَتْقَاكُمْ", urdu: "بیشک اللہ کے ہاں تم میں سے سب سے زیادہ عزت والا وہ ہے جو سب سے زیادہ متقی ہے۔", surah: "الحجرات: 13" },
+  { arabic: "وَفِي السَّمَاءِ رِزْقُكُمْ وَمَا تُوعَدُونَ", urdu: "اور تمہارا رزق اور جس کا تم سے وعدہ کیا جاتا ہے، آسمان میں ہے۔", surah: "الذاريات: 22" },
+  { arabic: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَى", urdu: "اور عنقریب تمہارا رب تمہیں اتنا دے گا کہ تم خوش ہو جاؤ گے۔", surah: "الضحى: 5" },
+  { arabic: "إِنَّ اللَّهَ يَأْمُرُ بِالْعَدْلِ وَالْإِحْسَانِ", urdu: "بیشک اللہ عدل اور احسان کا حکم دیتا ہے۔", surah: "النحل: 90" }
+];
+
 export default function AdminLogsPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<UserLoginRow[]>([]);
@@ -32,29 +66,45 @@ export default function AdminLogsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Quran Ticker States
+  // Initialize with a shuffled copy to avoid setting state synchronously inside useEffect
+  const [shuffledVerses] = useState(() => {
+    return [...QURAN_VERSES].sort(() => Math.random() - 0.5);
+  });
+  const [currentVerseIndex, setCurrentVerseIndex] = useState(0);
+
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchLogs = useCallback(async (isManualRefresh = false) => {
-    if (isManualRefresh) {
-      setRefreshing(true);
-    }
+  // Auto-slide timer with a short delay between transitions
+  useEffect(() => {
+    const intervalMs = 10000; // 5 seconds between items
+    const transitionDelayMs = 900; // small delay for smoother transitions if needed
 
+    const timer = setInterval(() => {
+      // optional small delay before updating index
+      setTimeout(() => {
+        setCurrentVerseIndex((prevIndex) => (prevIndex + 1) % shuffledVerses.length);
+      }, transitionDelayMs);
+    }, intervalMs);
+
+    return () => clearInterval(timer);
+  }, [shuffledVerses.length]);
+
+  const fetchLogs = async (isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
+    
     const {
       data: { session },
     } = await supabase.auth.getSession();
 
     if (!session) {
-      setLoading(false);
-      setRefreshing(false);
       router.replace('/signin');
       return;
     }
 
     if (session.user.app_metadata?.role !== 'admin') {
-      setLoading(false);
-      setRefreshing(false);
       router.replace('/dashboard');
       return;
     }
@@ -69,22 +119,19 @@ export default function AdminLogsPage() {
       setLogs([]);
     } else {
       setLogs(data ?? []);
-      if (isManualRefresh) {
-        toast.success('Logs refreshed successfully');
-      }
+      if (isManualRefresh) toast.success('Logs refreshed successfully');
     }
 
     setLoading(false);
     setRefreshing(false);
-  }, [router]);
+  };
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
+    const t = setTimeout(() => {
       void fetchLogs();
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [fetchLogs]);
+    }, 1000);
+    return () => clearTimeout(t);
+  }, [router]);
 
   // Handle Search Filtering
   const filteredLogs = useMemo(() => {
@@ -131,6 +178,40 @@ export default function AdminLogsPage() {
     <div className="min-h-screen bg-background text-foreground py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
         
+        {/* Quran News Ticker Banner */}
+        <div className="overflow-hidden rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-card to-emerald-950/60 p-3.5 shadow-lg">
+          <div className="flex items-center gap-3" dir="rtl">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-sm whitespace-nowrap border border-emerald-500/40 shrink-0">
+              <BookOpen className="h-4 w-4" />
+              <span>آیاتِ مبارکہ</span>
+            </div>
+            
+            {/* Vertical News Slide Container */}
+            <div className="relative h-10 w-full overflow-hidden flex items-center">
+              {shuffledVerses.map((item, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-x-0 transition-all duration-700 ease-in-out flex flex-wrap items-center gap-3 text-right ${
+                    index === currentVerseIndex
+                      ? 'opacity-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 -translate-y-8 pointer-events-none'
+                  }`}
+                >
+                  <span className="font-bold text-emerald-300 text-lg sm:text-xl font-serif">
+                    {item.arabic}
+                  </span>
+                  <span className="text-emerald-100/90 text-sm sm:text-base font-medium">
+                    — {item.urdu}
+                  </span>
+                  <span className="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">
+                    [{item.surah}]
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-6">
           <div>
