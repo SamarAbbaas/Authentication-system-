@@ -21,7 +21,8 @@ import {
   Sparkles,
   SendHorizonal,
   Bot,
-  LoaderCircle
+  LoaderCircle,
+  RefreshCw
 } from 'lucide-react';
 import Link from 'next/link';
 import ThemeToggle from '../themetoggler/page';
@@ -42,7 +43,7 @@ export default function DashboardPage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-          <div className="h-4 w-5 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+         <RefreshCw className="h-6 w-6 animate-spin text-primary" />
           <p className="font-medium text-muted-foreground animate-pulse">Loading dashboard...</p>
         </div>
       }
