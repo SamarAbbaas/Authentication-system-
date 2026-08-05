@@ -1,7 +1,7 @@
 'use client';
 
 import { supabase } from '@/lib/supabase';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -55,7 +55,6 @@ export default function DashboardPage() {
 
 function DashboardContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const appName = process.env.NEXT_PUBLIC_APP_NAME || 'DevPortal';
   const agentEnabled = process.env.NEXT_PUBLIC_AGENT_ENABLED === 'true';
   const [user, setUser] = useState<User | null>(null);
@@ -68,11 +67,17 @@ function DashboardContent() {
   const unauthorizedToastShown = useRef(false);
 
   useEffect(() => {
-    if (searchParams.get('unauthorized') === 'admin' && !unauthorizedToastShown.current) {
+    if (typeof window === 'undefined' || unauthorizedToastShown.current) {
+      return;
+    }
+
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (searchParams.get('unauthorized') === 'admin') {
       toast.error('Admin access only. You are not authorized to open this page.');
       unauthorizedToastShown.current = true;
     }
-  }, [searchParams]);
+  }, []);
 
   // Storage se avatar fetch karne ka central function
   const fetchUserAvatar = async (userId: string) => {
