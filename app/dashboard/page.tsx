@@ -244,7 +244,7 @@ function DashboardContent() {
               Admin Logs
             </Link>
             <Link 
-              href="/admin/logs" 
+              href="/Feedback" 
               className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
             >
               {/* <Shield className="size-4" /> */}
