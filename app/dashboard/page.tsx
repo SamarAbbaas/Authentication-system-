@@ -2,6 +2,8 @@
 
 import { supabase } from '@/lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import toast from 'react-hot-toast';
@@ -14,7 +16,6 @@ import {
   BarChart3, 
   Settings, 
   Shield,
-  LogOut, 
   Menu, 
   X,
   Sparkles,
@@ -37,6 +38,21 @@ import {
 const BUCKET_NAME = "Samar Abbas";
 
 export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+          <div className="h-4 w-5 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+          <p className="font-medium text-muted-foreground animate-pulse">Loading dashboard...</p>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
+function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const appName = process.env.NEXT_PUBLIC_APP_NAME || 'DevPortal';
@@ -118,7 +134,7 @@ export default function DashboardPage() {
       await supabase.auth.signOut();
       toast.success('Logged out successfully');
       router.push('/signin');
-    } catch (error) {
+    } catch {
       toast.error('Error logging out');
     }
   };
@@ -174,8 +190,8 @@ export default function DashboardPage() {
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Dynamic Background Effects */}
-      <div className="absolute top-[-10%] right-[-5%] h-[500px] w-[500px] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] h-[500px] w-[500px] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] h-125 w-125 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
 
       {/* ==================== ATTRACTIVE NAVBAR ==================== */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl transition-all">
@@ -183,10 +199,10 @@ export default function DashboardPage() {
           
           {/* Logo / Brand Name */}
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105">
               <Sparkles className="size-5" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-gray-900 via-indigo-950 to-gray-700 dark:from-white dark:via-indigo-200 dark:to-gray-400 bg-clip-text text-transparent">
+            <span className="text-xl font-bold tracking-tight bg-linear-to-r from-gray-900 via-indigo-950 to-gray-700 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-gray-400">
               {appName}
             </span>
           </Link>
@@ -238,10 +254,13 @@ export default function DashboardPage() {
             {imageUrl ? (
               <Dialog>
                 <DialogTrigger className="relative group focus:outline-none">
-                  <div className="size-10 rounded-full border-2 border-indigo-500/80 p-[1px] shadow-sm transition-transform group-hover:scale-105 dark:border-indigo-400">
-                    <img 
+                  <div className="size-10 rounded-full border-2 border-indigo-500/80 p-px shadow-sm transition-transform group-hover:scale-105 dark:border-indigo-400">
+                    <Image 
                       src={imageUrl} 
                       alt="User Avatar" 
+                      width={40}
+                      height={40}
+                      unoptimized
                       className="h-full w-full rounded-full object-cover"
                     />
                   </div>
@@ -250,9 +269,12 @@ export default function DashboardPage() {
 
                 <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
                   <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
-                  <img 
+                  <Image 
                     src={imageUrl} 
                     alt="Avatar Expanded" 
+                    width={960}
+                    height={960}
+                    unoptimized
                     className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
                   />
                 </DialogContent>
@@ -295,12 +317,12 @@ export default function DashboardPage() {
             {/* User Profile Summary in Mobile Menu */}
             <div className="flex items-center gap-3 border-b border-border pb-3">
               {imageUrl ? (
-                <img src={imageUrl} alt="Avatar" className="size-10 rounded-full object-cover border border-indigo-500" />
+                <Image src={imageUrl} alt="Avatar" width={40} height={40} unoptimized className="size-10 rounded-full object-cover border border-indigo-500" />
               ) : (
                 <UserCircle2 className="size-10 text-muted-foreground" />
               )}
               <div className="flex flex-col">
-                <span className="text-sm font-semibold truncate max-w-[200px]">{user?.email}</span>
+                <span className="text-sm font-semibold truncate max-w-50">{user?.email}</span>
                 <span className="text-xs text-muted-foreground">Logged In</span>
               </div>
             </div>
@@ -377,6 +399,7 @@ export default function DashboardPage() {
               <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
                 User Portal
               </span>
+
               <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Dashboard</h1>
               {user && (
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -390,17 +413,23 @@ export default function DashboardPage() {
               {imageUrl ? (
                 <Dialog>
                   <DialogTrigger className="size-16 rounded-full border-2 border-indigo-500 overflow-hidden shadow-md cursor-pointer hover:opacity-90 transition-opacity focus:outline-none">
-                    <img 
+                    <Image 
                       src={imageUrl} 
                       alt="Global Avatar" 
+                      width={64}
+                      height={64}
+                      unoptimized
                       className="h-full w-full object-cover"
                     />
                   </DialogTrigger>
                   <DialogContent className="max-w-md border-none bg-transparent p-0 shadow-none sm:max-w-lg flex flex-col items-center justify-center">
                     <DialogTitle className="sr-only">Profile Picture View</DialogTitle>
-                    <img 
+                    <Image 
                       src={imageUrl} 
                       alt="Avatar Expanded" 
+                      width={960}
+                      height={960}
+                      unoptimized
                       className="max-h-[80vh] max-w-full rounded-2xl object-contain shadow-2xl border-4 border-white/10"
                     />
                   </DialogContent>
@@ -438,7 +467,7 @@ export default function DashboardPage() {
             </Button>
           </div>
 
-          <div className="rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 via-background to-purple-500/10 p-5 shadow-inner sm:p-6">
+          <div className="rounded-3xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-background to-purple-500/10 p-5 shadow-inner sm:p-6">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-600/15 text-indigo-600 dark:text-indigo-300">
                 <Bot className="size-5" />
