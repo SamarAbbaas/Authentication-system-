@@ -42,7 +42,7 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+        <div className="saas-bg flex min-h-screen items-center justify-center text-foreground">
          <RefreshCw className="h-6 w-6 animate-spin text-primary" />
           <p className="font-medium text-muted-foreground animate-pulse">Loading dashboard...</p>
         </div>
@@ -184,7 +184,7 @@ function DashboardContent() {
     return (<>  
        
 
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
+      <div className="saas-bg flex min-h-screen items-center justify-center text-foreground">
         <div className="w-5 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
         
         <p className="text-muted-foreground animate-pulse font-medium">Loading dashboard...</p>
@@ -194,7 +194,7 @@ function DashboardContent() {
   }
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="saas-bg relative min-h-screen text-foreground overflow-x-hidden">
       {/* Dynamic Background Effects */}
       <div className="absolute top-[-10%] right-[-5%] h-125 w-125 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />

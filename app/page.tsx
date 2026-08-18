@@ -1,156 +1,107 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { ArrowRight, CircleCheck, Layers3, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { SaasPageShell, SaasSection, SaasStatsGrid } from "@/components/saas-shell";
+import { Button } from "@/components/ui/button";
 
- 
+const navItems = [
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Analytics", href: "/analytics" },
+  { label: "Pricing", href: "/Price" },
+  { label: "Settings", href: "/settings" },
+  { label: "Feedback", href: "/Feedback" },
+];
 
-import React from "react";
-
-import { motion, type Variants } from "framer-motion";
-
-import { Mail } from "lucide-react";
-
-// You'll need to install framer-motion & lucide-react:
-
-// npm install framer-motion lucide-react
-
-// --- Animation Variants for Framer Motion ---
-
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-
-  visible: {
-    opacity: 1,
-
-    transition: {
-      staggerChildren: 0.2,
-
-      delayChildren: 0.3,
-    },
+const highlights = [
+  {
+    title: "Pipeline Visibility",
+    text: "Track every team initiative from lead to release with clear ownership and live status signals.",
+    icon: Workflow,
   },
-};
-
-const itemVariants: Variants = {
-  hidden: { y: 20, opacity: 0 },
-
-  visible: {
-    y: 0,
-
-    opacity: 1,
-
-    transition: {
-      type: "spring" as const,
-
-      stiffness: 100,
-    },
+  {
+    title: "Unified Workspace",
+    text: "Product, growth, support, and operations share one canonical source of truth.",
+    icon: Layers3,
   },
-};
-const Newsletter = () => {
+  {
+    title: "Built-in Security",
+    text: "Role-aware access, audit-ready logs, and reliable authentication powered by Supabase.",
+    icon: ShieldCheck,
+  },
+];
+
+export default function HomePage() {
   return (
-    <div className="relative font-sans w-full min-h-screen flex items-center justify-center overflow-hidden p-4 bg-white dark:bg-black transition-colors duration-300">
-      <motion.div
-        className="relative z-10 container mx-auto text-center max-w-3xl"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Heading */}
+    <SaasPageShell
+      badge="SaaS Command Center"
+      title="Operate your product with confident speed"
+      subtitle="A professional, modern SaaS workspace for product ops, customer analytics, and secure team collaboration."
+      navItems={navItems}
+      actions={
+        <>
+          <Button asChild variant="outline" className="rounded-full">
+            <Link href="/signin">Sign in</Link>
+          </Button>
+          <Button asChild className="rounded-full">
+            <Link href="/signup">Get started</Link>
+          </Button>
+        </>
+      }
+    >
+      <SaasStatsGrid
+        items={[
+          { label: "Active Teams", value: "248", trend: "+14% month over month" },
+          { label: "Automated Workflows", value: "1,920", trend: "312 triggered today" },
+          { label: "Issue Resolution SLA", value: "98.6%", trend: "Sustained above target" },
+          { label: "Uptime", value: "99.98%", trend: "Last 90 days" },
+        ]}
+      />
 
-        <motion.h2
-          className="text-4xl md:text-5xl font-bold leading-tight tracking-tight text-gray-800 dark:text-gray-100"
-          variants={itemVariants}
-        >
-          Every success starts with a dream—yours begins here.
-        </motion.h2>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {highlights.map((item) => {
+          const Icon = item.icon;
+          return (
+            <SaasSection key={item.title} title={item.title}>
+              <div className="flex items-start gap-3">
+                <div className="rounded-xl border border-primary/20 bg-primary/10 p-2 text-primary">
+                  <Icon className="size-4" />
+                </div>
+                <p className="text-sm text-muted-foreground">{item.text}</p>
+              </div>
+            </SaasSection>
+          );
+        })}
+      </div>
 
-        {/* Subheading */}
+      <SaasSection title="Why teams choose this platform" description="Move from scattered tools to a single execution layer.">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {[
+            "Live KPI dashboards and fast reporting",
+            "Secure account lifecycle with role checks",
+            "Flexible feedback collection with rich categorization",
+            "Profile and account settings built for self-service",
+          ].map((value) => (
+            <div key={value} className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/50 px-3 py-2 text-sm">
+              <CircleCheck className="size-4 text-emerald-400" />
+              <span>{value}</span>
+            </div>
+          ))}
+        </div>
 
-        <motion.p
-          className="mt-6 text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
-          variants={itemVariants}
-        >
-          A cutting-edge platform where entrepreneurs, indie hackers, investors,
-          and VCs connect, collaborate, and fund the next big thing.
-        </motion.p>
-
-        {/* Email Form */}
-
-        <motion.form
-          className="mt-10 max-w-lg mx-auto"
-          onSubmit={(e) => e.preventDefault()}
-          variants={itemVariants}
-        >
-          <div className="relative flex flex-col  gap-4  justify-center sm:flex-row items-center bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-2 rounded-full shadow-lg border border-gray-200/80 dark:border-gray-600/80 group focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 dark:focus-within:ring-offset-gray-900 transition-all duration-300">
-            {/* <Mail className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500 hidden sm:block" /> */}
-
-            {/* <input
-              type="email"
-              placeholder="Your Email Address"
-              className="w-full sm:w-auto flex-grow bg-transparent sm:pl-12 px-4 py-3 text-gray-700 dark:text-gray-200 placeholder:text-gray-500 dark:placeholder:text-gray-400 outline-none text-center sm:text-left"
-            
-            /> */}
-
-            <button 
-                      className="w-full sm:w-auto px-6 py-3 bg-yellow-400 dark:bg-yellow-500 text-gray-900 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
-              <Link href='/signup'>Signup</Link>
-            </button>
-            <button 
-                         className="w-full sm:w-auto px-6 py-3 bg-yellow-400 dark:bg-yellow-500 text-gray-900 dark:text-black font-semibold rounded-lg shadow-md dark:shadow-gray-800 hover:bg-yellow-500 dark:hover:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-500 dark:focus:ring-yellow-400 focus:ring-offset-2 dark:focus:ring-offset-black transition duration-300 ease-in-out flex items-center justify-center">
-              <Link href='/signin'>Signin</Link>
-            </button>
-          </div>
-        </motion.form>
-
-        {/* Social Proof */}
-
-        <motion.div
-          className="mt-8 flex items-center justify-center space-x-3"
-          variants={itemVariants}
-        >
-          <div className="flex -space-x-2">
-            <img
-              className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800"
-              src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt="User 1"
-            />
-
-            <img
-              className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800"
-              src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt="User 2"
-            />
-
-            <img
-              className="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800"
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-              alt="User 3"
-            />
-          </div>
-
-          <p className="text-gray-600 dark:text-gray-400">
-            <span className="font-semibold text-gray-800 dark:text-gray-200">
-              10k+
-            </span>{" "}
-            joined already
-          </p>
-        </motion.div>
-      </motion.div>
-    </div>
-  );
-};
-
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-
-
-  <Newsletter />
-
-
-
-      
- 
-    </main>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button asChild>
+            <Link href="/dashboard" className="inline-flex items-center gap-2">
+              Open dashboard
+              <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/analytics" className="inline-flex items-center gap-2">
+              View analytics
+              <Sparkles className="size-4" />
+            </Link>
+          </Button>
+        </div>
+      </SaasSection>
+    </SaasPageShell>
   );
 }

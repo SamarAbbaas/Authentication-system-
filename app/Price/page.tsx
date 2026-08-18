@@ -1,80 +1,99 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import Link from "next/link";
+import { CheckCircle2, Crown, Rocket, Shield } from "lucide-react";
+import { SaasPageShell, SaasSection } from "@/components/saas-shell";
+import { Button } from "@/components/ui/button";
 
-interface PriceCardProps {
-  itemName: string;
-  itemNameLocal?: string | null;
-  unit: string;
-  minRate?: number;
-  maxRate?: number;
-  avgRate?: number;
-  category?: string;
-  categoryIcon?: string;
-  prevAvgRate?: number;
-  onClick?: () => void;
-}
+const plans = [
+  {
+    name: "Starter",
+    price: "$29",
+    period: "per workspace / month",
+    icon: Rocket,
+    description: "For early-stage teams shipping their first product motions.",
+    features: ["Up to 8 team members", "Core dashboard + analytics", "Email support", "Basic automation rules"],
+  },
+  {
+    name: "Growth",
+    price: "$89",
+    period: "per workspace / month",
+    icon: Crown,
+    highlighted: true,
+    description: "For scaling SaaS teams optimizing conversion and retention.",
+    features: ["Up to 40 team members", "Advanced analytics and cohorts", "Priority support", "Role-based permissions"],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    period: "annual contract",
+    icon: Shield,
+    description: "For regulated organizations with security and compliance needs.",
+    features: ["Unlimited members", "Dedicated success manager", "Custom integrations", "Audit-grade controls"],
+  },
+];
 
-export default function Price({
-  itemName,
-  itemNameLocal,
-  unit,
-  minRate = 0,
-  maxRate = 0,
-  avgRate = 0,
-  category,
-  categoryIcon,
-  prevAvgRate,
-  onClick
-}: PriceCardProps) {
-  // Safe calculation to avoid division by zero or NaN issues
-  const change = (prevAvgRate && prevAvgRate > 0)
-    ? ((avgRate - prevAvgRate) / prevAvgRate) * 100 
-    : 0;
-
-  const TrendIcon = change > 1 ? TrendingUp : change < -1 ? TrendingDown : Minus;
-  const trendColor = change > 1 ? 'text-red-500' : change < -1 ? 'text-emerald-500' : 'text-slate-400';
-  const trendBg = change > 1 ? 'bg-red-50' : change < -1 ? 'bg-emerald-50' : 'bg-slate-50';
-
+export default function PricingPage() {
   return (
-    <div
-      onClick={onClick}
-      className={`bg-white rounded-2xl border border-slate-100 p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${onClick ? 'cursor-pointer' : ''}`}
+    <SaasPageShell
+      badge="Pricing"
+      title="Simple pricing that scales with your product"
+      subtitle="Choose a plan that matches your stage and upgrade when your pipeline and team grow."
+      navItems={[
+        { label: "Landing", href: "/" },
+        { label: "Dashboard", href: "/dashboard" },
+        { label: "Analytics", href: "/analytics" },
+        { label: "Settings", href: "/settings" },
+      ]}
+      actions={
+        <Button asChild className="rounded-full">
+          <Link href="/signup">Start free trial</Link>
+        </Button>
+      }
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-slate-800 text-base leading-tight truncate">{itemName}</p>
-          {itemNameLocal && (
-            <p className="text-sm text-slate-400 mt-0.5">{itemNameLocal}</p>
-          )}
-        </div>
-        {categoryIcon && (
-          <span className="text-2xl ml-2 flex-shrink-0">{categoryIcon}</span>
-        )}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {plans.map((plan) => {
+          const Icon = plan.icon;
+          return (
+            <SaasSection
+              key={plan.name}
+              title={plan.name}
+              description={plan.description}
+            >
+              <div className={`rounded-xl border p-4 ${plan.highlighted ? "border-primary/50 bg-primary/10" : "border-border/70 bg-background/60"}`}>
+                <div className="mb-2 flex items-center justify-between">
+                  <Icon className="size-5 text-primary" />
+                  {plan.highlighted ? <span className="saas-badge">Most Popular</span> : null}
+                </div>
+                <p className="text-3xl font-semibold tracking-tight">{plan.price}</p>
+                <p className="text-xs text-muted-foreground">{plan.period}</p>
+              </div>
+
+              <ul className="mt-4 space-y-2 text-sm">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2 rounded-lg border border-border/60 bg-background/50 p-2">
+                    <CheckCircle2 className="mt-0.5 size-4 text-emerald-400" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button className="mt-4 w-full" variant={plan.highlighted ? "default" : "outline"}>
+                Choose {plan.name}
+              </Button>
+            </SaasSection>
+          );
+        })}
       </div>
 
-      <div className="flex items-end justify-between mt-4">
-        <div>
-          <p className="text-2xl font-bold text-slate-900">
-            Rs. {Number(avgRate)?.toFixed(0) ?? '0'}
-            <span className="text-sm font-normal text-slate-400 ml-1">/{unit}</span>
-          </p>
-          <p className="text-xs text-slate-400 mt-1">
-            Range: Rs. {Number(minRate)?.toFixed(0) ?? '0'} – {Number(maxRate)?.toFixed(0) ?? '0'}
-          </p>
+      <SaasSection title="Need a custom rollout?" description="Enterprise migration, procurement, and compliance support are available.">
+        <div className="flex flex-wrap items-center gap-3">
+          <Button asChild>
+            <Link href="/Feedback">Contact sales</Link>
+          </Button>
+          <Button asChild variant="ghost">
+            <Link href="/signin">Sign in to manage subscription</Link>
+          </Button>
         </div>
-        {prevAvgRate !== undefined && (
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${trendBg} ${trendColor}`}>
-            <TrendIcon size={12} />
-            {Math.abs(change).toFixed(1)}%
-          </div>
-        )}
-      </div>
-
-      {category && (
-        <div className="mt-3 pt-3 border-t border-slate-50">
-          <span className="text-xs text-slate-400">{category}</span>
-        </div>
-      )}
-    </div>
+      </SaasSection>
+    </SaasPageShell>
   );
 }

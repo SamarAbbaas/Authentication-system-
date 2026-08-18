@@ -185,8 +185,8 @@ export default function Signup() {
   }
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center p-6 bg-background">
-      <Card className="w-full max-w-sm relative bg-white dark:bg-black border border-border rounded-lg p-2 shadow-sm transition-all duration-200 hover:shadow-md">
+    <div className="flex w-full items-center justify-center p-2 sm:p-6">
+      <Card className="w-full max-w-sm border border-border/70 bg-card/90 p-2 shadow-sm transition-all duration-200 hover:shadow-md">
         
         {/* Header */}
         <CardHeader className="flex flex-col space-y-2 text-center mb-2">

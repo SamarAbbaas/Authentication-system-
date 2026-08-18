@@ -128,3 +128,31 @@
     @apply font-sans;
   }
 }
+
+@layer components {
+  .saas-bg {
+    background:
+      radial-gradient(1100px 520px at 110% -10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent 65%),
+      radial-gradient(880px 460px at -10% 100%, color-mix(in oklab, var(--chart-1) 35%, transparent), transparent 68%),
+      linear-gradient(180deg, color-mix(in oklab, var(--background) 94%, white), var(--background));
+  }
+
+  .dark .saas-bg {
+    background:
+      radial-gradient(900px 500px at 110% -5%, color-mix(in oklab, var(--primary) 20%, transparent), transparent 70%),
+      radial-gradient(760px 420px at -10% 105%, color-mix(in oklab, var(--chart-1) 18%, transparent), transparent 72%),
+      linear-gradient(180deg, color-mix(in oklab, var(--background) 96%, black), var(--background));
+  }
+
+  .saas-card {
+    @apply rounded-2xl border border-border/70 bg-card/90 shadow-sm backdrop-blur;
+  }
+
+  .saas-glass {
+    @apply bg-background/75 backdrop-blur-xl;
+  }
+
+  .saas-badge {
+    @apply inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-primary;
+  }
+}

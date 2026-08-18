@@ -110,26 +110,26 @@ export default function UpdatePasswordClient() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center p-8">
-      <div className="w-full max-w-md space-y-8">
+    <div className="mx-auto w-full max-w-md rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm">
+      <div className="space-y-8">
         {checkingSession ? (
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-center text-sm text-muted-foreground">
             Verifying recovery session...
           </div>
         ) : null}
 
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Set new password</h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">Must be at least 6 characters.</p>
+          <h2 className="text-3xl font-bold text-foreground">Set new password</h2>
+          <p className="mt-2 text-muted-foreground">Must be at least 6 characters.</p>
         </div>
 
         <form onSubmit={handleUpdatePassword} className="space-y-6">
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="password" className="mb-2 block text-sm font-medium text-foreground">
               New Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <LockIcon />
               </div>
               <input
@@ -140,17 +140,17 @@ export default function UpdatePasswordClient() {
                 placeholder="••••••••"
                 required
                 disabled={loading}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-black text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="block w-full rounded-lg border border-border bg-background py-3 pl-10 pr-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-foreground">
               Confirm New Password
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                 <LockIcon />
               </div>
               <input
@@ -161,7 +161,7 @@ export default function UpdatePasswordClient() {
                 placeholder="••••••••"
                 required
                 disabled={loading}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-black text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="block w-full rounded-lg border border-border bg-background py-3 pl-10 pr-3 text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function UpdatePasswordClient() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg disabled:opacity-50"
+            className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground shadow-lg disabled:opacity-50"
           >
             {loading ? "Updating password..." : "Reset password"}
           </button>

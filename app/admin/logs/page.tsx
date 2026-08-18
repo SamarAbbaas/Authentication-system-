@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
@@ -92,7 +92,7 @@ export default function AdminLogsPage() {
     return () => clearInterval(timer);
   }, [shuffledVerses.length]);
 
-  const fetchLogs = async (isManualRefresh = false) => {
+  const fetchLogs = useCallback(async (isManualRefresh = false) => {
     if (isManualRefresh) setRefreshing(true);
     
     const {
@@ -124,14 +124,14 @@ export default function AdminLogsPage() {
 
     setLoading(false);
     setRefreshing(false);
-  };
+  }, [router]);
 
   useEffect(() => {
     const t = setTimeout(() => {
       void fetchLogs();
     }, 1000);
     return () => clearTimeout(t);
-  }, [router]);
+  }, [fetchLogs]);
 
   // Handle Search Filtering
   const filteredLogs = useMemo(() => {
@@ -175,11 +175,11 @@ export default function AdminLogsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-8 px-4 sm:px-6 lg:px-8">
+    <div className="saas-bg min-h-screen text-foreground py-8 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl space-y-8">
         
         {/* Quran News Ticker Banner */}
-        <div className="overflow-hidden rounded-xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-card to-emerald-950/60 p-3.5 shadow-lg">
+        <div className="overflow-hidden rounded-xl border border-emerald-500/30 bg-linear-to-r from-emerald-950/60 via-card to-emerald-950/60 p-3.5 shadow-lg">
           <div className="flex items-center gap-3" dir="rtl">
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-sm whitespace-nowrap border border-emerald-500/40 shrink-0">
               <BookOpen className="h-4 w-4" />

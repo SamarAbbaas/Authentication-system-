@@ -491,7 +491,7 @@ export default function UploadPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="saas-bg min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground animate-pulse">
           Loading secure session...
         </p>
@@ -500,7 +500,7 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-10 text-foreground sm:px-6 lg:px-8">
+    <div className="saas-bg min-h-screen px-4 py-10 text-foreground sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
         {/* Header */}
         <div className="flex items-center justify-between gap-3 rounded-2xl border bg-background p-4 shadow-sm">
@@ -583,7 +583,7 @@ export default function UploadPage() {
               Your  selected preview media.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center gap-4 min-h-[260px]">
+            <CardContent className="flex min-h-65 flex-col items-center justify-center gap-4">
               {/* Pehle priority Preview ko milegi, phir Active Avatar ko, warna Fallback placeholder */}
               {previewUrl ? (
                 <div className="text-center">

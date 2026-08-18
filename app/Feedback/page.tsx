@@ -94,7 +94,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="saas-bg min-h-screen text-foreground py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <Toaster position="top-right" />
 
       <div className="mx-auto max-w-4xl space-y-8">
