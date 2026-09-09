@@ -44,8 +44,8 @@ export default function PricingPage() {
         { label: "Settings", href: "/settings" },
       ]}
       actions={
-        <Button asChild className="rounded-full">
-          <Link href="/signup">Start free trial</Link>
+        <Button render={<Link href="/signup" />} className="rounded-full">
+          Start free trial
         </Button>
       }
     >
@@ -86,11 +86,11 @@ export default function PricingPage() {
 
       <SaasSection title="Need a custom rollout?" description="Enterprise migration, procurement, and compliance support are available.">
         <div className="flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <Link href="/Feedback">Contact sales</Link>
+          <Button render={<Link href="/Feedback" />}>
+            Contact sales
           </Button>
-          <Button asChild variant="ghost">
-            <Link href="/signin">Sign in to manage subscription</Link>
+          <Button render={<Link href="/signin" />} variant="ghost">
+            Sign in to manage subscription
           </Button>
         </div>
       </SaasSection>

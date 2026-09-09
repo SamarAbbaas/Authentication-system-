@@ -18,7 +18,6 @@ import {
   Shield,
   Menu, 
   X,
-  Sparkles,
   SendHorizonal,
   Bot,
   LoaderCircle,
@@ -42,7 +41,7 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="saas-bg flex min-h-screen items-center justify-center text-foreground">
+        <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
          <RefreshCw className="h-6 w-6 animate-spin text-primary" />
           <p className="font-medium text-muted-foreground animate-pulse">Loading dashboard...</p>
         </div>
@@ -184,7 +183,7 @@ function DashboardContent() {
     return (<>  
        
 
-      <div className="saas-bg flex min-h-screen items-center justify-center text-foreground">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="w-5 h-4 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
         
         <p className="text-muted-foreground animate-pulse font-medium">Loading dashboard...</p>
@@ -194,58 +193,48 @@ function DashboardContent() {
   }
 
   return (
-    <div className="saas-bg relative min-h-screen text-foreground overflow-x-hidden">
-      {/* Dynamic Background Effects */}
-      <div className="absolute top-[-10%] right-[-5%] h-125 w-125 rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] h-125 w-125 rounded-full bg-purple-500/10 blur-[120px] pointer-events-none" />
-
-      {/* ==================== ATTRACTIVE NAVBAR ==================== */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl transition-all">
+    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           
           {/* Logo / Brand Name */}
-          <Link href="/dashboard" className="flex items-center gap-2 group">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-500/20 transition-transform group-hover:scale-105">
-              <Sparkles className="size-5" />
-            </div>
-            <span className="text-xl font-bold tracking-tight bg-linear-to-r from-gray-900 via-indigo-950 to-gray-700 bg-clip-text text-transparent dark:from-white dark:via-indigo-200 dark:to-gray-400">
-              {appName}
-            </span>
+          <Link href="/dashboard" className="text-lg font-semibold">
+            {appName}
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 rounded-full border border-border/50 bg-muted/40 px-3 py-1.5 shadow-inner">
+          <nav className="hidden items-center gap-5 md:flex">
             <Link 
               href="/Price" 
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors hover:bg-background hover:text-primary text-foreground"
+              className="flex items-center gap-2 text-sm font-medium text-foreground hover:text-primary"
             >
               <Home className="size-4" />
               Home
             </Link>
             <Link 
               href="/analytics" 
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               <BarChart3 className="size-4" />
               Analytics
             </Link>
             <Link 
               href="/settings" 
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               <Settings className="size-4" />
               Settings
             </Link>
             <Link 
               href="/admin/logs" 
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               <Shield className="size-4" />
               Admin Logs
             </Link>
             <Link 
               href="/Feedback" 
-              className="flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               {/* <Shield className="size-4" /> */}
               Feedback
@@ -397,12 +386,12 @@ function DashboardContent() {
 
       {/* ==================== MAIN DASHBOARD CONTENT ==================== */}
       <main className="relative mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="relative w-full rounded-3xl border border-border/60 bg-card/80 p-6 shadow-xl backdrop-blur-md sm:p-10 space-y-8">
+        <div className="w-full space-y-8 rounded-lg border border-border bg-card p-6 sm:p-8">
           
           {/* Welcome Header */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border/50 pb-6">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
+              <span className="mb-2 text-xs font-medium text-muted-foreground">
                 User Portal
               </span>
 
@@ -415,7 +404,7 @@ function DashboardContent() {
             </div>
 
             {/* Profile Avatar Card in Dashboard */}
-            <div className="flex items-center gap-4 bg-muted/30 p-3 rounded-2xl border border-border/40">
+            <div className="flex items-center gap-4 rounded-lg border border-border p-3">
               {imageUrl ? (
                 <Dialog>
                   <DialogTrigger className="size-16 rounded-full border-2 border-indigo-500 overflow-hidden shadow-md cursor-pointer hover:opacity-90 transition-opacity focus:outline-none">
@@ -473,7 +462,7 @@ function DashboardContent() {
             </Button>
           </div>
 
-          <div className="rounded-3xl border border-indigo-500/20 bg-linear-to-br from-indigo-500/10 via-background to-purple-500/10 p-5 shadow-inner sm:p-6">
+          <div className="rounded-lg border border-border p-5 sm:p-6">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-2xl bg-indigo-600/15 text-indigo-600 dark:text-indigo-300">
                 <Bot className="size-5" />

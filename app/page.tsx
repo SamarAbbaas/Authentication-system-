@@ -38,11 +38,11 @@ export default function HomePage() {
       navItems={navItems}
       actions={
         <>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/signin">Sign in</Link>
+          <Button render={<Link href="/signin" />} variant="outline" className="rounded-full">
+            Sign in
           </Button>
-          <Button asChild className="rounded-full">
-            <Link href="/signup">Get started</Link>
+          <Button render={<Link href="/signup" />} className="rounded-full">
+            Get started
           </Button>
         </>
       }
@@ -88,17 +88,13 @@ export default function HomePage() {
         </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
-          <Button asChild>
-            <Link href="/dashboard" className="inline-flex items-center gap-2">
-              Open dashboard
-              <ArrowRight className="size-4" />
-            </Link>
+          <Button render={<Link href="/dashboard" className="inline-flex items-center gap-2" />}>
+            Open dashboard
+            <ArrowRight className="size-4" />
           </Button>
-          <Button asChild variant="ghost">
-            <Link href="/analytics" className="inline-flex items-center gap-2">
-              View analytics
-              <Sparkles className="size-4" />
-            </Link>
+          <Button render={<Link href="/analytics" className="inline-flex items-center gap-2" />} variant="ghost">
+            View analytics
+            <Sparkles className="size-4" />
           </Button>
         </div>
       </SaasSection>

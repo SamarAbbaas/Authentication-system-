@@ -16,8 +16,8 @@ export default function HomeRoutePage() {
         { label: "Settings", href: "/settings" },
       ]}
       actions={
-        <Button asChild className="rounded-full">
-          <Link href="/dashboard">Open dashboard</Link>
+        <Button render={<Link href="/dashboard" />} className="rounded-full">
+          Open dashboard
         </Button>
       }
     >
