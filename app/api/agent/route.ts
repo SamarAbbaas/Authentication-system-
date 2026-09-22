@@ -4,13 +4,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const openaiApiKey = process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY || '';
 const openrouterApiKey = process.env.OPENROUTER_API_KEY || '';
+const openaiApiKey = process.env.OPENAI_API_KEY || '';
+const apiKey = openrouterApiKey || openaiApiKey;
 const appName = process.env.NEXT_PUBLIC_APP_NAME || 'DevPortal';
 
-const openai = openaiApiKey
+const openai = apiKey
   ? new OpenAI({
-      apiKey: openaiApiKey,
+      apiKey,
       baseURL: openrouterApiKey ? 'https://openrouter.ai/api/v1' : undefined,
     })
   : null;
@@ -116,7 +117,14 @@ Assistant: Refunds are subject to our billing policy. Please contact our support
       ],
     });
 
-    const reply = response.choices[0]?.message?.content?.trim() || 'No response was generated.';
+    const reply = response.choices[0]?.message?.content?.trim();
+
+    if (!reply) {
+      return NextResponse.json(
+        { error: 'The assistant provider returned an empty response.' },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ reply });
   } catch (error) {
