@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
+import type { Session } from '@supabase/supabase-js'
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -25,7 +26,14 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  let session: Session | null = null
+
+  try {
+    const result = await supabase.auth.getSession()
+    session = result.data.session
+  } catch (error) {
+    console.error('Supabase is unavailable. Check NEXT_PUBLIC_SUPABASE_URL.', error)
+  }
 
   // Protect dashboard route
   if (request.nextUrl.pathname.startsWith('/dashboard')) {

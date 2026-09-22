@@ -48,7 +48,7 @@ GitHub: https://github.com/samarabbaas
 LinkedIn: https://linkedin.com/in/samarabbaas
 
 Profile:
-Motivated second-year Software Engineering student at the University of Gujrat with a strong frontend foundation  . Proficient in React, Next.js, TypeScript, Tailwind CSS, and Supabase, with hands-on experience through self-initiated projects. Eager to apply academic knowledge in a real-world setting and grow as a developer through an internship opportunity.
+Motivated Last year  Software Engineering student at the University of Gujrat with a strong frontend foundation  . Proficient in React, Next.js, TypeScript, Tailwind CSS, and Supabase, with hands-on experience through self-initiated projects. Eager to apply academic knowledge in a real-world setting and grow as a developer through an internship opportunity.
 
 Technical Skills:
 - Languages: JavaScript (ES6+), TypeScript, HTML5, CSS3

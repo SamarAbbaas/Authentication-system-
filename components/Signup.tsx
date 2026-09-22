@@ -155,7 +155,7 @@ export default function Signup() {
       const { error, data } = await supabase.auth.signUp({
         email: email,
         password: password,
-        phone: phone, // Agar user phone na likhna chahe to ye optional reh sakta hai
+        ...(phone.trim() ? { phone: phone.trim() } : {}),
         options: {
           data: {
             full_name: name,
